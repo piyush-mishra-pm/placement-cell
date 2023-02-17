@@ -1,0 +1,5 @@
+# Hiding built js files from ts.
+/build
+
+# Hiding Dev Envt keys from pushing.
+/src/config/dev.js
