@@ -140,6 +140,6 @@ npm start
 - ❌ Update ReadMe.
 - ✅ Postgres, routes and controllers for students, interviews and their sessions.
 - ❌ DB Cursors (For lists output in get requests).
-- ❌ Transactions when student or interviews get deleted, so that sessions also get removed.
+- ✅ Transactions when student or interviews get deleted, so that sessions also get removed.
 - 
 

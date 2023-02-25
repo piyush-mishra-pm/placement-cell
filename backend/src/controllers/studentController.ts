@@ -52,13 +52,31 @@ export async function updateStudent(req: Request, res: Response, next: NextFunct
 
 export async function deleteStudent(req: Request, res: Response, next: NextFunction) {
     const { studentId } = req.params;
+    const client = await pgDb.getClient();
 
     try {
-        const results = await pgDb.query('DELETE FROM students WHERE id=$1', [studentId]);
-        return res.status(200).send({ success: 'true', message: 'Deleted Student successfully', data: results.rows });
+        // Transation:
+        await client.query('BEGIN');
+        // Step1: Delete Interview Sessions of Student:
+        const deleteStudentSessionResults = await pgDb.query(
+            'DELETE FROM sessions WHERE student_id=$1',
+            [studentId]);
+        // Step2: Delete Student details:
+        const deleteStudentResults = await pgDb.query(
+            'DELETE FROM students WHERE id=$1',
+            [studentId]);
+        // COMMIT Transaction:
+        await client.query('COMMIT');
+
+        return res.status(200).send({ success: 'true', message: 'Deleted Student Details and Interview-Sessions info  successfully', data: deleteStudentResults.rows });
     } catch (e) {
-        console.log('Student Update failed: ', e);
+        // ROLLBACK Transaction if failure:
+        await client.query('ROLLBACK');
+
+        console.log('Student Deletion failed: ', e);
         next(new ErrorObject(500, `Something went wrong in deleteStudent!${e}`));
+    } finally {
+        client.release();
     }
 }
 

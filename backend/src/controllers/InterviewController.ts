@@ -50,15 +50,62 @@ export async function updateInterview(req: Request, res: Response, next: NextFun
     }
 }
 
-export async function deleteInterview(req: Request, res: Response, next: NextFunction) {
-    const { interviewId } = req.params;
+export async function deleteStudent(req: Request, res: Response, next: NextFunction) {
+    const { studentId } = req.params;
+    const client = await pgDb.getClient();
 
     try {
-        const results = await pgDb.query('DELETE FROM interviews WHERE id=$1', [interviewId]);
+        // Transation:
+        await client.query('BEGIN');
+        // Step1: Delete Interview Sessions of Student:
+        const deleteStudentSessionResults = await pgDb.query(
+            'DELETE FROM sessions WHERE student_id=$1',
+            [studentId]);
+
+        // Step2: Delete Student details:
+        const deleteStudentResults = await pgDb.query(
+            'DELETE FROM students WHERE id=$1',
+            [studentId]);
+        // COMMIT Transaction:
+        await client.query('COMMIT');
+        return res.status(200).send({ success: 'true', message: 'Deleted Student Details and Interview-Sessions info  successfully', data: deleteStudentResults.rows });
+    } catch (e) {
+        console.log('Student Deletion failed: ', e);
+        // ROLLBACK Transaction if failure:
+        await client.query('ROLLBACK');
+        next(new ErrorObject(500, `Something went wrong in deleteStudent!${e}`));
+    } finally {
+        client.release();
+    }
+}
+
+export async function deleteInterview(req: Request, res: Response, next: NextFunction) {
+    const { interviewId } = req.params;
+    const client = await pgDb.getClient();
+
+    try {
+        // Transation:
+        await client.query('BEGIN');
+        // Step1: Delete Interview Sessions:
+        const deleteStudentSessionResults = await pgDb.query(
+            'DELETE FROM sessions WHERE interview_id=$1',
+            [interviewId]);
+        // Step2: Delete Interview details:
+        const results = await pgDb.query(
+            'DELETE FROM interviews WHERE id=$1',
+            [interviewId]);
+        // COMMIT Transaction:
+        await client.query('COMMIT');
+
         return res.status(200).send({ success: 'true', message: 'Deleted Interview successfully', data: results.rows });
     } catch (e) {
+        // ROLLBACK Transaction if failure:
+        await client.query('ROLLBACK');
+
         console.log('Interview Deletion failed: ', e);
         next(new ErrorObject(500, `Something went wrong in deleteInterview!${e}`));
+    } finally {
+        client.release();
     }
 }
 
