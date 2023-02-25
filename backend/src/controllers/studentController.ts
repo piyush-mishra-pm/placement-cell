@@ -14,9 +14,9 @@ export async function getAllStudents(req: Request, res: Response, next: NextFunc
 }
 
 export async function getStudent(req: Request, res: Response, next: NextFunction) {
-    const { id } = req.params;
+    const { studentId } = req.params;
     try {
-        const results = await pgDb.query('SELECT * FROM students WHERE id=$1', [id]);
+        const results = await pgDb.query('SELECT * FROM students WHERE id=$1', [studentId]);
         // todo: append interview details of student as well.
         return res.status(200).send({ success: 'true', message: 'Successfully fetched Student details.', data: results.rows[0] });
     } catch (e) {
@@ -39,10 +39,10 @@ export async function createStudent(req: Request, res: Response, next: NextFunct
 
 export async function updateStudent(req: Request, res: Response, next: NextFunction) {
     const { first_name, last_name, batch } = req.body;
-    const { id } = req.params;
+    const { studentId } = req.params;
 
     try {
-        const results = await pgDb.query('UPDATE students SET first_name=$1, last_name=$2, batch=$3 WHERE id=$4', [first_name, last_name, batch, id]);
+        const results = await pgDb.query('UPDATE students SET first_name=$1, last_name=$2, batch=$3 WHERE id=$4', [first_name, last_name, batch, studentId]);
         return res.status(200).send({ success: 'true', message: 'Updated Student successfully', data: results.rows });
     } catch (e) {
         console.log('Student Update failed: ', e);
@@ -51,10 +51,10 @@ export async function updateStudent(req: Request, res: Response, next: NextFunct
 }
 
 export async function deleteStudent(req: Request, res: Response, next: NextFunction) {
-    const { id } = req.params;
+    const { studentId } = req.params;
 
     try {
-        const results = await pgDb.query('DELETE FROM students WHERE id=$1', [id]);
+        const results = await pgDb.query('DELETE FROM students WHERE id=$1', [studentId]);
         return res.status(200).send({ success: 'true', message: 'Deleted Student successfully', data: results.rows });
     } catch (e) {
         console.log('Student Update failed: ', e);
@@ -63,11 +63,15 @@ export async function deleteStudent(req: Request, res: Response, next: NextFunct
 }
 
 export async function studentIdExistInDB(req: Request, res: Response, next: NextFunction) {
-    const { id } = req.params;
+    // Extract id from params, query, or body
+    let studentId = req.params.studentId || req.query.studentId || req.body.studentId;
 
     try {
+        if (!studentId) {
+            throw new Error("id undefined. Neither in query nor in Params");
+        }
         // studentID exists?
-        const studentExistsResults = await pgDb.query('SELECT * FROM students WHERE id=$1', [id]);
+        const studentExistsResults = await pgDb.query('SELECT * FROM students WHERE id=$1', [studentId]);
         if (studentExistsResults.rows.length === 0) {
             return next(new ErrorObject(400, `Student ID doesn't exist!`));
         } else {
