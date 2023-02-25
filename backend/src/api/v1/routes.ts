@@ -2,7 +2,7 @@ import { Router, Request, Response } from "express";
 import { login, logout, register, user } from '../../controllers/authController';
 import { forgot, reset } from '../../controllers/forgotController';
 import { studentIdExistInDB, getAllStudents, getStudent, createStudent, updateStudent, deleteStudent } from '../../controllers/studentController';
-import { getAllInterviews, getInterview, createInterview, updateInterview, deleteInterview } from '../../controllers/InterviewController';
+import { interviewIdExistInDB, getAllInterviews, getInterview, createInterview, updateInterview, deleteInterview } from '../../controllers/InterviewController';
 
 import checkRecaptcha from '../../middlewares/checkRecaptcha';
 
@@ -30,8 +30,8 @@ export function configureRouter(router: Router) {
 
     // CRUD Interviews:
     router.get('/api/v1/interviews', getAllInterviews);
-    router.get('/api/v1/interview/:id', getInterview);
+    router.get('/api/v1/interview/:id', interviewIdExistInDB, getInterview);
     router.post('/api/v1/interview', createInterview);
-    router.put('/api/v1/interview/:id', updateInterview);
-    router.delete('/api/v1/interview/:id', deleteInterview);
+    router.put('/api/v1/interview/:id', interviewIdExistInDB, updateInterview);
+    router.delete('/api/v1/interview/:id', interviewIdExistInDB, deleteInterview);
 }
