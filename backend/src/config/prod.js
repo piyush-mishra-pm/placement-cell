@@ -14,4 +14,5 @@ module.exports = {
   FE_URI: process.env.FE_URI,
   NODE_ENV: process.env.NODE_ENV,
   ADMIN_EMAIL_ID: process.env.ADMIN_EMAIL_ID,
+  POSTGRES_URL: process.env.POSTGRES_URL,
 };
