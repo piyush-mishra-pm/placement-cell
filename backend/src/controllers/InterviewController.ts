@@ -4,8 +4,14 @@ import pgDb from '../db/pg';
 import ErrorObject from '../utils/ErrorObject';
 
 export async function getAllInterviews(req: Request, res: Response, next: NextFunction) {
+    const page = parseInt(req.params.page);
+    const itemsPerPage = parseInt(req.params.itemsPerPage);
+
     try {
-        const results = await pgDb.query('SELECT * FROM interviews');
+        const results = await pgDb.query(
+            'SELECT * FROM interviews LIMIT $1 OFFSET $2',
+            [itemsPerPage, (page - 1) * itemsPerPage]);
+
         return res.status(200).send({ success: 'true', message: 'Fetched Interview records successfully', data: results.rows });
     } catch (e) {
         console.log('getAllInterviews failed: ', e);

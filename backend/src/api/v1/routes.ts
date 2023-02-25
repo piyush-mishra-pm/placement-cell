@@ -23,24 +23,24 @@ export function configureRouter(router: Router) {
     router.post('/api/v1/reset', validationFactory(resetValidation), reset);
 
     // CRUD Student:
-    router.get('/api/v1/students', getAllStudents);
+    router.get('/api/v1/students/:page/:itemsPerPage', getAllStudents);
     router.get('/api/v1/student/:studentId', studentIdExistInDB, getStudent);
     router.post('/api/v1/student', createStudent);
     router.put('/api/v1/student/:studentId', studentIdExistInDB, updateStudent);
     router.delete('/api/v1/student/:studentId', studentIdExistInDB, deleteStudent);
 
     // CRUD Interviews:
-    router.get('/api/v1/interviews', getAllInterviews);
+    router.get('/api/v1/interviews/:page/:itemsPerPage', getAllInterviews);
     router.get('/api/v1/interview/:interviewId', interviewIdExistInDB, getInterview);
     router.post('/api/v1/interview', createInterview);
     router.put('/api/v1/interview/:interviewId', interviewIdExistInDB, updateInterview);
     router.delete('/api/v1/interview/:interviewId', interviewIdExistInDB, deleteInterview);
 
     // CRUD Sessions (Student-Interview session):
-    router.get('/api/v1/sessions/student/:studentId', studentIdExistInDB, getSessionsOfStudent);
-    router.get('/api/v1/sessions/interview/:interviewId', interviewIdExistInDB, getSessionsOfInterview);
-    router.get('/api/v1/session', studentIdExistInDB, interviewIdExistInDB, sessionExists, getSession);
-    router.post('/api/v1/session', studentIdExistInDB, interviewIdExistInDB, createSession);
-    router.put('/api/v1/session', studentIdExistInDB, interviewIdExistInDB, sessionExists, updateSessionStatus);
-    router.delete('/api/v1/session', studentIdExistInDB, interviewIdExistInDB, sessionExists, deleteSession);
+    router.get('/api/v1/sessions/student/:studentId/:page/:itemsPerPage', studentIdExistInDB, getSessionsOfStudent);
+    router.get('/api/v1/sessions/interview/:interviewId/:page/:itemsPerPage', interviewIdExistInDB, getSessionsOfInterview);
+    router.get('/api/v1/session', studentIdExistInDB, interviewIdExistInDB, sessionExists(true), getSession);
+    router.post('/api/v1/session', studentIdExistInDB, interviewIdExistInDB, sessionExists(false), createSession);
+    router.put('/api/v1/session', studentIdExistInDB, interviewIdExistInDB, sessionExists(true), updateSessionStatus);
+    router.delete('/api/v1/session', studentIdExistInDB, interviewIdExistInDB, sessionExists(true), deleteSession);
 }

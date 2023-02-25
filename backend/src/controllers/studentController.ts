@@ -5,7 +5,15 @@ import ErrorObject from '../utils/ErrorObject';
 
 export async function getAllStudents(req: Request, res: Response, next: NextFunction) {
     try {
-        const results = await pgDb.query('SELECT * FROM students');
+        const page = parseInt(req.params.page);
+        const itemsPerPage = parseInt(req.params.itemsPerPage);
+
+        const results = await pgDb.query(
+            `SELECT * 
+            FROM students
+            LIMIT $1 OFFSET $2`,
+            [itemsPerPage, (page - 1) * itemsPerPage]);
+
         return res.status(200).send({ success: 'true', message: 'Fetched student records successfully', data: results.rows });
     } catch (e) {
         console.log('getAllStudents failed: ', e);

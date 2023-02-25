@@ -50,7 +50,8 @@ export async function getSession(req: Request, res: Response, next: NextFunction
 
 export async function getSessionsOfStudent(req: Request, res: Response, next: NextFunction) {
     const { studentId } = req.params;
-
+    const page = parseInt(req.params.page);
+    const itemsPerPage = parseInt(req.params.itemsPerPage);
     try {
         const results = await pgDb.query(
             `SELECT 
@@ -66,8 +67,9 @@ export async function getSessionsOfStudent(req: Request, res: Response, next: Ne
             FROM students AS st 
             LEFT JOIN sessions ss ON ss.student_id = st.id 
             LEFT JOIN interviews int ON int.id = ss.interview_id
-            WHERE student_id=$1`,
-            [studentId]);
+            WHERE student_id=$1
+            LIMIT $2 OFFSET $3`,
+            [studentId, itemsPerPage, (page - 1) * itemsPerPage]);
         return res.status(200).send({ success: 'true', message: 'Fetched Sessions of student successfully', data: results.rows });
     } catch (e) {
         console.log('Fetching Student Session failed: ', e);
@@ -77,6 +79,8 @@ export async function getSessionsOfStudent(req: Request, res: Response, next: Ne
 
 export async function getSessionsOfInterview(req: Request, res: Response, next: NextFunction) {
     const { interviewId } = req.params;
+    const page = parseInt(req.params.page);
+    const itemsPerPage = parseInt(req.params.itemsPerPage);
 
     try {
         const results = await pgDb.query(
@@ -93,8 +97,9 @@ export async function getSessionsOfInterview(req: Request, res: Response, next: 
             FROM interviews AS int 
             LEFT JOIN sessions ss ON int.id = ss.interview_id
             LEFT JOIN students st ON ss.student_id = st.id 
-            WHERE interview_id=$1`,
-            [interviewId]);
+            WHERE interview_id=$1
+            LIMIT $2 OFFSET $3`,
+            [interviewId, itemsPerPage, (page - 1) * itemsPerPage]);
         return res.status(200).send({ success: 'true', message: 'Fetched Sessions of interview successfully', data: results.rows });
     } catch (e) {
         console.log('Fetching Sessions of interview failed: ', e);
@@ -131,22 +136,34 @@ export async function deleteSession(req: Request, res: Response, next: NextFunct
     }
 }
 
-export async function sessionExists(req: Request, res: Response, next: NextFunction) {
-    const { studentId, interviewId } = req.body;
-    try {
-        if (!studentId || !interviewId) {
-            throw new Error("ID of Student or Interview is missing in body.");
+export function sessionExists(allowExistence: boolean) {
+
+    return async (req: Request, res: Response, next: NextFunction) => {
+        const { studentId, interviewId } = req.body;
+        try {
+            if (!studentId || !interviewId) {
+                throw new Error("ID of Student or Interview is missing in body.");
+            }
+            // studentID exists?
+            const sessionExistsResults = await pgDb.query('SELECT * FROM sessions WHERE student_id=$1 AND interview_id=$2', [studentId, interviewId]);
+            if (allowExistence) {
+                if (sessionExistsResults.rows.length === 0) {
+                    return next(new ErrorObject(400, `Such session doesn't exist!`));
+                } else {
+                    next();
+                }
+            } else {
+                if (sessionExistsResults.rows.length === 0) {
+                    next();
+                } else {
+                    return next(new ErrorObject(400, `Such session already exist, can't recreate it!`));
+                }
+            }
+
         }
-        // studentID exists?
-        const sessionExistsResults = await pgDb.query('SELECT * FROM sessions WHERE student_id=$1 AND interview_id=$2', [studentId, interviewId]);
-        if (sessionExistsResults.rows.length === 0) {
-            return next(new ErrorObject(400, `Such session doesn't exist!`));
-        } else {
-            next();
+        catch (e) {
+            console.log('Error in finding Session: ', e);
+            next(new ErrorObject(500, `Something went wrong in finding session in DB!${e}`));
         }
-    }
-    catch (e) {
-        console.log('Error in finding Session: ', e);
-        next(new ErrorObject(500, `Something went wrong in finding session in DB!${e}`));
     }
 }
