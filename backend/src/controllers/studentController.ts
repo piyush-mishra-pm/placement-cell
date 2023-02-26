@@ -2,6 +2,8 @@ import { NextFunction, Request, Response } from 'express';
 
 import pgDb from '../db/pg';
 import ErrorObject from '../utils/ErrorObject';
+import { redisSaveWithTtl } from '../db/redis';
+import { getRedisKey, REDIS_QUERY_TYPE } from '../db/redisHelper';
 
 export async function getAllStudents(req: Request, res: Response, next: NextFunction) {
     try {
@@ -14,6 +16,10 @@ export async function getAllStudents(req: Request, res: Response, next: NextFunc
             LIMIT $1 OFFSET $2`,
             [itemsPerPage, (page - 1) * itemsPerPage]);
 
+        if (results.rows.length === 0) {
+            return next(new ErrorObject(400, `Students don't exist!`));
+        }
+        await redisSaveWithTtl(getRedisKey(REDIS_QUERY_TYPE.STUDENTS_GET, req), results.rows, 10);
         return res.status(200).send({ success: 'true', message: 'Fetched student records successfully', data: results.rows });
     } catch (e) {
         console.log('getAllStudents failed: ', e);
@@ -26,6 +32,12 @@ export async function getStudent(req: Request, res: Response, next: NextFunction
     try {
         const results = await pgDb.query('SELECT * FROM students WHERE id=$1', [studentId]);
         // todo: append interview details of student as well.
+
+        if (results.rows.length === 0) {
+            return next(new ErrorObject(400, `Student doesn't exist!`));
+        }
+        // Save in Cache:
+        await redisSaveWithTtl(getRedisKey(REDIS_QUERY_TYPE.STUDENT_GET, req), results.rows, 10);
         return res.status(200).send({ success: 'true', message: 'Successfully fetched Student details.', data: results.rows[0] });
     } catch (e) {
         console.log('getStudent failed: ', e);
@@ -101,6 +113,8 @@ export async function studentIdExistInDB(req: Request, res: Response, next: Next
         if (studentExistsResults.rows.length === 0) {
             return next(new ErrorObject(400, `Student ID doesn't exist!`));
         } else {
+            // Save in Cache:
+            await redisSaveWithTtl(getRedisKey(REDIS_QUERY_TYPE.STUDENT_ID_EXISTS, req), studentExistsResults.rows, 10);
             next();
         }
     }

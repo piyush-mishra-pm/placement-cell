@@ -2,6 +2,8 @@ import { NextFunction, Request, Response } from 'express';
 
 import pgDb from '../db/pg';
 import ErrorObject from '../utils/ErrorObject';
+import { redisSaveWithTtl } from '../db/redis';
+import { getRedisKey, REDIS_QUERY_TYPE } from '../db/redisHelper';
 
 export async function getAllInterviews(req: Request, res: Response, next: NextFunction) {
     const page = parseInt(req.params.page);
@@ -11,7 +13,10 @@ export async function getAllInterviews(req: Request, res: Response, next: NextFu
         const results = await pgDb.query(
             'SELECT * FROM interviews LIMIT $1 OFFSET $2',
             [itemsPerPage, (page - 1) * itemsPerPage]);
-
+        if (results.rows.length === 0) {
+            return next(new ErrorObject(400, 'No Interviews results!'));
+        }
+        await redisSaveWithTtl(getRedisKey(REDIS_QUERY_TYPE.INTERVIEWS_GET, req), results.rows, 10);
         return res.status(200).send({ success: 'true', message: 'Fetched Interview records successfully', data: results.rows });
     } catch (e) {
         console.log('getAllInterviews failed: ', e);
@@ -24,6 +29,11 @@ export async function getInterview(req: Request, res: Response, next: NextFuncti
     try {
         const results = await pgDb.query('SELECT * FROM interviews WHERE id=$1', [interviewId]);
         // todo: append interview details of Interview as well.
+        if (results.rows.length === 0) {
+            return next(new ErrorObject(400, 'No such interview found'));
+        }
+        // Save in Cache:
+        await redisSaveWithTtl(getRedisKey(REDIS_QUERY_TYPE.INTERVIEW_GET, req), results.rows, 10);
         return res.status(200).send({ success: 'true', message: 'Successfully fetched Interview details.', data: results.rows[0] });
     } catch (e) {
         console.log('getInterview failed: ', e);
@@ -125,6 +135,8 @@ export async function interviewIdExistInDB(req: Request, res: Response, next: Ne
         if (interviewExistsResults.rows.length === 0) {
             return next(new ErrorObject(400, `Interview ID ${interviewId} doesn't exist!`));
         } else {
+            // Save in Cache:
+            await redisSaveWithTtl(getRedisKey(REDIS_QUERY_TYPE.INTERVIEW_ID_EXISTS, req), interviewExistsResults.rows, 10);
             next();
         }
     }

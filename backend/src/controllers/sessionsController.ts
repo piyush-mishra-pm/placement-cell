@@ -2,6 +2,8 @@ import { NextFunction, Request, Response } from 'express';
 
 import pgDb from '../db/pg';
 import ErrorObject from '../utils/ErrorObject';
+import { redisSaveWithTtl } from '../db/redis';
+import { getRedisKey, REDIS_QUERY_TYPE } from '../db/redisHelper';
 
 export async function createSession(req: Request, res: Response, next: NextFunction) {
     const { studentId, interviewId, interviewStatus } = req.body;
@@ -41,6 +43,10 @@ export async function getSession(req: Request, res: Response, next: NextFunction
             LEFT JOIN interviews int ON int.id = ss.interview_id
             WHERE student_id=$1 AND interview_id=$2`,
             [studentId, interviewId]);
+        if (results.rows.length === 0) {
+            return next(new ErrorObject(400, 'No such interview session exists.'));
+        }
+        await redisSaveWithTtl(getRedisKey(REDIS_QUERY_TYPE.SESSION_GET, req), results.rows, 10);
         return res.status(200).send({ success: 'true', message: 'Fetched Session successfully', data: results.rows });
     } catch (e) {
         console.log('Fetching Session failed: ', e);
@@ -70,6 +76,11 @@ export async function getSessionsOfStudent(req: Request, res: Response, next: Ne
             WHERE student_id=$1
             LIMIT $2 OFFSET $3`,
             [studentId, itemsPerPage, (page - 1) * itemsPerPage]);
+        if (results.rows.length === 0) {
+            return next(new ErrorObject(400, 'No such interview sessions of the student.'));
+        }
+        // Save in Cache:
+        await redisSaveWithTtl(getRedisKey(REDIS_QUERY_TYPE.SESSIONS_OF_STUDENT_ID, req), results.rows, 10);
         return res.status(200).send({ success: 'true', message: 'Fetched Sessions of student successfully', data: results.rows });
     } catch (e) {
         console.log('Fetching Student Session failed: ', e);
@@ -100,6 +111,11 @@ export async function getSessionsOfInterview(req: Request, res: Response, next: 
             WHERE interview_id=$1
             LIMIT $2 OFFSET $3`,
             [interviewId, itemsPerPage, (page - 1) * itemsPerPage]);
+        if (results.rows.length === 0) {
+            return next(new ErrorObject(400, 'No such interview sessions of the Interview.'));
+        }
+        // Save in Cache:
+        await redisSaveWithTtl(getRedisKey(REDIS_QUERY_TYPE.SESSIONS_OF_INTERVIEW_ID, req), results.rows, 10);
         return res.status(200).send({ success: 'true', message: 'Fetched Sessions of interview successfully', data: results.rows });
     } catch (e) {
         console.log('Fetching Sessions of interview failed: ', e);
@@ -150,6 +166,7 @@ export function sessionExists(allowExistence: boolean) {
                 if (sessionExistsResults.rows.length === 0) {
                     return next(new ErrorObject(400, `Such session doesn't exist!`));
                 } else {
+                    await redisSaveWithTtl(getRedisKey(REDIS_QUERY_TYPE.SESSION_ID_EXISTS, req), sessionExistsResults.rows, 10);
                     next();
                 }
             } else {

@@ -15,4 +15,5 @@ module.exports = {
   NODE_ENV: process.env.NODE_ENV,
   ADMIN_EMAIL_ID: process.env.ADMIN_EMAIL_ID,
   POSTGRES_URL: process.env.POSTGRES_URL,
+  REDIS_URL: process.env.REDIS_URL,
 };

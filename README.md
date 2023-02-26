@@ -142,5 +142,7 @@ npm start
 - ✅ DB Cursors (For lists output in get requests).
 - ✅ Transactions when student or interviews get deleted, so that sessions also get removed.
 - ❌ Validation for path params, body.
-- 
+- ✅ Redis caching in Get (Student, Interviews and Sessions).
+- ❌ Redis caching in Auth.
+- ❌ Redis caching in create, update and delete as well.
 
