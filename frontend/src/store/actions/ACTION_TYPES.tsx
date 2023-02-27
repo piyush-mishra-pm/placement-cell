@@ -14,6 +14,10 @@ const ACTION_TYPES = {
     GET_STUDENTS: 'GET_STUDENTS',
     GET_STUDENT: 'GET_STUDENT',
   },
+
+  INTERVIEWS: {
+    GET_INTERVIEWS: 'GET_INTERVIEWS',
+  },
 };
 
 export default ACTION_TYPES;
