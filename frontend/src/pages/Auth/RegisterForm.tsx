@@ -3,10 +3,10 @@ import {Link, useHistory} from 'react-router-dom';
 import ReCAPTCHA from 'react-google-recaptcha';
 import {toast} from 'react-toastify';
 
-import OAuth from '../components/OAuth';
-import {useHttpClient} from '../hooks/httpHook';
-import ErrorModal from '../components/ErrorModal';
-import LoadingSpinner from '../components/LoadingSpinner';
+import OAuth from '../../components/OAuth';
+import {useHttpClient} from '../../hooks/httpHook';
+import ErrorModal from '../../components/ErrorModal';
+import LoadingSpinner from '../../components/LoadingSpinner';
 
 function RegisterForm() {
   // Creating State objects:

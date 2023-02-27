@@ -1,9 +1,9 @@
 import React, {SyntheticEvent, useState} from 'react';
 import {Link, useHistory} from 'react-router-dom';
 import {toast} from 'react-toastify';
-import {useHttpClient} from '../hooks/httpHook';
-import LoadingSpinner from '../components/LoadingSpinner';
-import ErrorModal from '../components/ErrorModal';
+import {useHttpClient} from '../../hooks/httpHook';
+import LoadingSpinner from '../../components/LoadingSpinner';
+import ErrorModal from '../../components/ErrorModal';
 
 function ForgotPassword() {
   const [email, setEmail] = useState('');

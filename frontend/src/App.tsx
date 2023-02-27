@@ -1,15 +1,15 @@
 import React from 'react';
 import {BrowserRouter, Route, Switch} from 'react-router-dom';
 
-import RegisterForm from './pages/RegisterForm';
+import RegisterForm from './pages/Auth/RegisterForm';
 import Home from './pages/Home';
-import Login from './pages/Login';
+import Login from './pages/Auth/Login';
 import HeaderNav from './pages/HeaderNav';
-import ForgotPassword from './pages/ForgotPassword';
-import ResetPassword from './pages/ResetPassword';
+import ForgotPassword from './pages/Auth/ForgotPassword';
+import ResetPassword from './pages/Auth/ResetPassword';
 import ToastContainerWrapper from './components/ToastContainerWrapper';
 import NotFound from './pages/NotFound';
-import ResetPasswordMailSent from './pages/ResetPasswordMailSent';
+import ResetPasswordMailSent from './pages/Auth/ResetPasswordMailSent';
 import OAuthSuccess from './pages/oAuth/OAuthSuccess';
 import OAuthFailure from './pages/oAuth/OAuthFailure';
 

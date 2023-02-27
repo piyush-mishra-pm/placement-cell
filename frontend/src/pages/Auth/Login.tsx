@@ -3,12 +3,12 @@ import {Link, useHistory} from 'react-router-dom';
 import {toast} from 'react-toastify';
 import ReCAPTCHA from 'react-google-recaptcha';
 
-import ACTION_TYPES from '../store/actions/ACTION_TYPES';
-import {useUserDispatcher, useAuthDispatcher} from '../store/actions/DISPATCH_HOOK_REGISTRY';
-import OAuth from '../components/OAuth';
-import {useHttpClient} from '../hooks/httpHook';
-import LoadingSpinner from '../components/LoadingSpinner';
-import ErrorModal from '../components/ErrorModal';
+import ACTION_TYPES from '../../store/actions/ACTION_TYPES';
+import {useUserDispatcher, useAuthDispatcher} from '../../store/actions/DISPATCH_HOOK_REGISTRY';
+import OAuth from '../../components/OAuth';
+import {useHttpClient} from '../../hooks/httpHook';
+import LoadingSpinner from '../../components/LoadingSpinner';
+import ErrorModal from '../../components/ErrorModal';
 
 function Login() {
   const [email, setEmail] = useState('');
