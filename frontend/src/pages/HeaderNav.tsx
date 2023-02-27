@@ -39,6 +39,27 @@ function HeaderNav() {
           Auth-React-Node
         </Link>
         <div className="menu right">
+          {loggedInUser && (
+            <div className="item">
+              <Link className="ui positive button" to="/students">
+                Students
+              </Link>
+            </div>
+          )}
+          {loggedInUser && (
+            <div className="item">
+              <Link className="ui positive button" to="/interviews">
+                Interviews
+              </Link>
+            </div>
+          )}
+          {loggedInUser && (
+            <div className="item">
+              <Link className="ui positive button" to="/reports">
+                Reports
+              </Link>
+            </div>
+          )}
           {!loggedInUser && (
             <div className="item">
               <Link className="ui positive button" to="/register">
