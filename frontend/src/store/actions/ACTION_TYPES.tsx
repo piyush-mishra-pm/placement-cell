@@ -9,6 +9,11 @@ const ACTION_TYPES = {
     FILL_PII: 'FILL_PII',
     RESET_PII: 'RESET_PII',
   },
+
+  STUDENTS: {
+    GET_STUDENTS: 'GET_STUDENTS',
+    GET_STUDENT: 'GET_STUDENT',
+  },
 };
 
 export default ACTION_TYPES;

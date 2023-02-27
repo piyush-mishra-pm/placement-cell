@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from "express";
 
 import { redisGet } from "./redis";
 import ErrorObject from "../utils/ErrorObject";
-import { isNull } from "lodash";
 
 export function getRedisKey(queryType: REDIS_QUERY_TYPE, req: Request): string {
     const studentId = req.params.studentId || req.query.studentId || req.body.studentId;

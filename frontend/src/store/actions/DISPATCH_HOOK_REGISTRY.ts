@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
-import { AUTH_PAYLOAD, USER_PAYLOAD } from '../PAYLOAD_DEFINITIONS';
+import { AUTH_PAYLOAD, USER_PAYLOAD, STUDENT_PAYLOAD } from '../PAYLOAD_DEFINITIONS';
 
 export const useAuthDispatcher = () => {
     const dispatch = useDispatch();
@@ -12,6 +12,13 @@ export const useAuthDispatcher = () => {
 export const useUserDispatcher = () => {
     const dispatch = useDispatch();
     return useCallback((type: string, payload: USER_PAYLOAD | undefined) => {
+        dispatch({ type, payload })
+    }, [dispatch]);
+}
+
+export const useStudentsDispatcher = () => {
+    const dispatch = useDispatch();
+    return useCallback((type: string, payload: STUDENT_PAYLOAD[] | undefined) => {
         dispatch({ type, payload })
     }, [dispatch]);
 }
