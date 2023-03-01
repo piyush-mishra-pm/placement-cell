@@ -7,8 +7,8 @@ import {AUTH_STATE, STATE} from '../store/STATE_DEFINITIONS';
 import {useUserDispatcher, useAuthDispatcher} from '../store/actions/DISPATCH_HOOK_REGISTRY';
 import {useHttpClient} from '../hooks/httpHook';
 import {toast} from 'react-toastify';
-import ErrorModal from '../components/ErrorModal';
-import LoadingSpinner from '../components/LoadingSpinner';
+import ErrorModal from './ErrorModal';
+import LoadingSpinner from './LoadingSpinner';
 
 // todo: control 'active' tab, depending upon which screen is current screen.
 function HeaderNav() {

@@ -1,13 +1,13 @@
 import React, {useEffect} from 'react';
 import {toast} from 'react-toastify';
 
-import ACTION_TYPES from '../../store/actions/ACTION_TYPES';
-import {useInterviewsDispatcher} from '../../store/actions/DISPATCH_HOOK_REGISTRY';
-import {useHttpClient} from '../../hooks/httpHook';
-import LoadingSpinner from '../../components/LoadingSpinner';
-import ErrorModal from '../../components/ErrorModal';
+import ACTION_TYPES from '../../../store/actions/ACTION_TYPES';
+import {useInterviewsDispatcher} from '../../../store/actions/DISPATCH_HOOK_REGISTRY';
+import {useHttpClient} from '../../../hooks/httpHook';
+import LoadingSpinner from '../../../components/LoadingSpinner';
+import ErrorModal from '../../../components/ErrorModal';
 import {useSelector} from 'react-redux';
-import {INTERVIEWS_STATE, STATE} from '../../store/STATE_DEFINITIONS';
+import {INTERVIEWS_STATE, STATE} from '../../../store/STATE_DEFINITIONS';
 
 function Interviews() {
   const {isLoading, error, sendRequest, clearErrorHandler} = useHttpClient();

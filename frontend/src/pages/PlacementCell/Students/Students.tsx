@@ -1,13 +1,13 @@
 import React, {useEffect} from 'react';
 import {toast} from 'react-toastify';
 
-import ACTION_TYPES from '../../store/actions/ACTION_TYPES';
-import {useStudentsDispatcher} from '../../store/actions/DISPATCH_HOOK_REGISTRY';
-import {useHttpClient} from '../../hooks/httpHook';
-import LoadingSpinner from '../../components/LoadingSpinner';
-import ErrorModal from '../../components/ErrorModal';
+import ACTION_TYPES from '../../../store/actions/ACTION_TYPES';
+import {useStudentsDispatcher} from '../../../store/actions/DISPATCH_HOOK_REGISTRY';
+import {useHttpClient} from '../../../hooks/httpHook';
+import LoadingSpinner from '../../../components/LoadingSpinner';
+import ErrorModal from '../../../components/ErrorModal';
 import {useSelector} from 'react-redux';
-import {STATE, STUDENTS_STATE} from '../../store/STATE_DEFINITIONS';
+import {STATE, STUDENTS_STATE} from '../../../store/STATE_DEFINITIONS';
 
 function Students() {
   const {isLoading, error, sendRequest, clearErrorHandler} = useHttpClient();
