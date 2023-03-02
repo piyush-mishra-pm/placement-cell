@@ -10,6 +10,8 @@ export default function studentsReducer(state = INITIAL_STUDENTS_STATE, {type, p
       return _.uniqBy(_.union(state, payload), 'id');
     case ACTION_TYPES.STUDENTS.CREATE_STUDENT:
       return _.cloneDeep(state.concat(payload[0]));
+    case ACTION_TYPES.STUDENTS.DELETE_STUDENT:
+      return _.cloneDeep(state.concat(payload[0]));
     default:
       return state;
   }

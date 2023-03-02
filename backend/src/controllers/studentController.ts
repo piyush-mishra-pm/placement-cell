@@ -83,7 +83,7 @@ export async function deleteStudent(req: Request, res: Response, next: NextFunct
             [studentId]);
         // Step2: Delete Student details:
         const deleteStudentResults = await pgDb.query(
-            'DELETE FROM students WHERE id=$1',
+            'DELETE FROM students WHERE id=$1 RETURNING *',
             [studentId]);
         // COMMIT Transaction:
         await client.query('COMMIT');

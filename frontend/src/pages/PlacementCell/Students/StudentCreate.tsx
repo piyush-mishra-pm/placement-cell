@@ -39,7 +39,6 @@ export default function StudentCreate() {
       });
       console.log(results);
       studentsDispatcher(ACTION_TYPES.STUDENTS.CREATE_STUDENT, results.data);
-      window.location.reload();
     } catch (e: any) {
       console.error('error in student creation');
     }

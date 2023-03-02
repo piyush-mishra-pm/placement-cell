@@ -31,6 +31,24 @@ function Students() {
     })();
   }, [sendRequest, studentsDispatcher]);
 
+  function deleteStudent(studentId: number | null | undefined) {
+    if (!studentId) return;
+
+    (async () => {
+      try {
+        const response = await sendRequest({
+          successMessage: 'Student successfully deleted!',
+          url: `/student/${studentId}`,
+          method: 'DELETE',
+        });
+        console.log('Deleting student:', response);
+        studentsDispatcher(ACTION_TYPES.STUDENTS.DELETE_STUDENT, response.data);
+      } catch (e: any) {
+        // Don't reset Students Redux state.
+      }
+    })();
+  }
+
   function renderContent() {
     return (
       <div className="ui container">
@@ -41,6 +59,7 @@ function Students() {
             <div className="item" key={student.id}>
               <div className="header">{`${student.id}. ${student.first_name} ${student.last_name}`}</div>
               {student.batch}
+              <i className="trash alternate outline icon" onClick={() => deleteStudent(student.id)}></i>
             </div>
           ))}
         </div>
