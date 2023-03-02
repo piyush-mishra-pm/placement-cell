@@ -49,7 +49,7 @@ export async function createStudent(req: Request, res: Response, next: NextFunct
     const { first_name, last_name, batch } = req.body;
 
     try {
-        const results = await pgDb.query('INSERT INTO students(first_name, last_name, batch) VALUES($1, $2, $3)', [first_name, last_name, batch]);
+        const results = await pgDb.query('INSERT INTO students(first_name, last_name, batch) VALUES($1, $2, $3) RETURNING *', [first_name, last_name, batch]);
         return res.status(200).send({ success: 'true', message: 'Created Student successfully', data: results.rows });
     } catch (e) {
         console.log('Create Student failed: ', e);

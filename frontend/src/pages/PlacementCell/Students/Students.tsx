@@ -8,6 +8,7 @@ import LoadingSpinner from '../../../components/LoadingSpinner';
 import ErrorModal from '../../../components/ErrorModal';
 import {useSelector} from 'react-redux';
 import {STATE, STUDENTS_STATE} from '../../../store/STATE_DEFINITIONS';
+import StudentCreate from './StudentCreate';
 
 function Students() {
   const {isLoading, error, sendRequest, clearErrorHandler} = useHttpClient();
@@ -34,6 +35,7 @@ function Students() {
     return (
       <div className="ui container">
         <h2>Students</h2>
+        <StudentCreate />
         <div className="ui list">
           {studentsState.map((student) => (
             <div className="item" key={student.id}>
