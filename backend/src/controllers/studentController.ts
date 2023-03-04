@@ -11,8 +11,20 @@ export async function getAllStudents(req: Request, res: Response, next: NextFunc
         const itemsPerPage = parseInt(req.params.itemsPerPage);
 
         const results = await pgDb.query(
-            `SELECT * 
-            FROM students
+            `SELECT 
+                st.id as student_id, 
+                first_name, last_name, 
+                batch, 
+                ss.interview_id, 
+                company_name, 
+                interview_name, 
+                description, 
+                time, 
+                interview_status 
+            FROM students AS st 
+            LEFT JOIN sessions ss ON ss.student_id = st.id 
+            LEFT JOIN interviews int ON int.id = ss.interview_id
+            ORDER BY student_id
             LIMIT $1 OFFSET $2`,
             [itemsPerPage, (page - 1) * itemsPerPage]);
 

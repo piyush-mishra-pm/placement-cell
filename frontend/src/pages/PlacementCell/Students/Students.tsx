@@ -59,10 +59,16 @@ function Students() {
         <StudentCreate />
         <div className="ui list">
           {studentsState.map((student) => (
-            <div className="item" key={student.id}>
-              <div className="header">{`${student.id}. ${student.first_name} ${student.last_name}`}</div>
-              {student.batch}
-              <i className="trash alternate outline icon" onClick={() => deleteStudent(student.id)}></i>
+            <div className="item" key={`${student.student_id}_${student.interview_id}`}>
+              <div className="header">{`${student.student_id}. ${student.first_name} ${student.last_name}`}</div>
+              batch: {student.batch},<br/>
+              interview_id: {student.interview_id} <br/>
+              company_name: {student.company_name} <br/>
+              interview_name:{student.interview_name} <br/>
+              description:{student.description} <br/>
+              time:{student.time} <br/>
+              interview_status:{student.interview_status} <br/>
+              <i className="trash alternate outline icon" onClick={() => deleteStudent(student.student_id)}></i>
             </div>
           ))}
         </div>

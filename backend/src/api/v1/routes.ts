@@ -12,7 +12,6 @@ import checkRecaptcha from '../../middlewares/checkRecaptcha';
 import { validationFactory } from "../../middlewares/validateInputs";
 import { registerValidation, loginValidation, forgotValidation, resetValidation } from "../../models/validationModels";
 import checkAuth from "../../middlewares/checkAuth";
-import envKeys from "../../config/envKeys";
 
 export function configureRouter(router: Router) {
     // Auth Routes:

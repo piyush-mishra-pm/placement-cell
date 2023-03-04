@@ -10,10 +10,16 @@ export interface USER_PAYLOAD {
 }
 
 export interface STUDENT_PAYLOAD {
-    id: number | null | undefined;
-    first_name: string | null | undefined;
-    last_name: string | null | undefined;
-    batch: string | null | undefined;
+    student_id?: number;
+    first_name?: string;
+    last_name?: string;
+    batch?: string;
+    interview_id?:number;
+    company_name?: string;
+    interview_name?:string;
+    description?:string;
+    time?:number;
+    interview_status?:string;
 }
 
 export interface INTERVIEW_PAYLOAD {
