@@ -145,4 +145,4 @@ npm start
 - ✅ Redis caching in Get (Student, Interviews and Sessions).
 - ❌ Redis caching in Auth.
 - ❌ Redis caching in create, update and delete as well.
-
+- ❌ Modal when fetching list of Students, Interviews, Jobs, etc.

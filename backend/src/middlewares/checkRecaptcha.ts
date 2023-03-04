@@ -2,13 +2,15 @@ import axios from "axios";
 import { NextFunction, Request, Response } from "express";
 
 import ErrorObject from '../utils/ErrorObject';
-import * as KEYS from '../config/envKeys';
+import envKeys, * as KEYS from '../config/envKeys';
 
-export default function checkRecaptcha(enabled:string|undefined) {
-    return (async function checkRecaptcha(req: Request, res: Response, next: NextFunction) {
-        if(!enabled || enabled.toLowerCase()!=='true'){
-            return next();
-        }
+export default function checkRecaptcha(req:Request,res:Response,next:NextFunction) {
+    const enabled = envKeys.ENABLE_RECAPTCHA;
+    if (!enabled || enabled.toLocaleLowerCase()!=='true'){
+        return next();
+    }
+    else {
+        return (async function checkRecaptcha(req: Request, res: Response, next: NextFunction) {
 
         if (!req.body.captcha) {
             return next(new ErrorObject(400, 'Missing Re-Captcha.'));
@@ -25,4 +27,5 @@ export default function checkRecaptcha(enabled:string|undefined) {
             return next(new ErrorObject(500, 'Something wrong happened during Re-Captcha verification.'));
         }
     });
+}
 }

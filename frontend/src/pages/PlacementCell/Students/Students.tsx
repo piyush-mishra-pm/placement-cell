@@ -7,13 +7,14 @@ import {useHttpClient} from '../../../hooks/httpHook';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 import ErrorModal from '../../../components/ErrorModal';
 import {useSelector} from 'react-redux';
-import {STATE, STUDENTS_STATE} from '../../../store/STATE_DEFINITIONS';
+import {AUTH_STATE, STATE, STUDENTS_STATE} from '../../../store/STATE_DEFINITIONS';
 import StudentCreate from './StudentCreate';
 
 function Students() {
   const {isLoading, error, sendRequest, clearErrorHandler} = useHttpClient();
   const studentsDispatcher = useStudentsDispatcher();
   const studentsState: STUDENTS_STATE = useSelector((state: STATE) => state.students);
+  const authState: AUTH_STATE = useSelector((state:STATE)=>state.auth);
 
   useEffect(() => {
     (async () => {
@@ -22,6 +23,7 @@ function Students() {
           successMessage: 'Studenst successfully fetched!',
           url: '/students/1/10',
           method: 'GET',
+          headers: {'Authorization': `Bearer ${authState.jwt}`}
         });
         console.log(response);
         studentsDispatcher(ACTION_TYPES.STUDENTS.GET_STUDENTS, response.data);
@@ -29,7 +31,7 @@ function Students() {
         // Don't reset Students Redux state.
       }
     })();
-  }, [sendRequest, studentsDispatcher]);
+  }, [sendRequest, studentsDispatcher,authState.jwt]);
 
   function deleteStudent(studentId: number | null | undefined) {
     if (!studentId) return;
@@ -40,6 +42,7 @@ function Students() {
           successMessage: 'Student successfully deleted!',
           url: `/student/${studentId}`,
           method: 'DELETE',
+          headers: {'Authorization': `Bearer ${authState.jwt}`}
         });
         console.log('Deleting student:', response);
         studentsDispatcher(ACTION_TYPES.STUDENTS.DELETE_STUDENT, response.data);

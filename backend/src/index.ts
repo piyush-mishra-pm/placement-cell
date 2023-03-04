@@ -27,7 +27,7 @@ app.use((req, res, next) => {
       'Access-Control-Allow-Headers',
       'Origin, X-Requested-With, Content-Type, Accept, Authorization'
   );
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, HEAD, PUT, PATCH, DELETE, OPTIONS');
   
   // Preflight response OK.
   // When browser creates an OPTIONS request just before making actual non-GET requests ()like POST, PATCH, DELETE).

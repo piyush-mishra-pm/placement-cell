@@ -1,12 +1,14 @@
 import React from 'react';
 import {useForm} from 'react-hook-form';
 import {toast} from 'react-toastify';
+import { useSelector } from 'react-redux';
 
 import {useHttpClient} from '../../../hooks/httpHook';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 import ErrorModal from '../../../components/ErrorModal';
 import {useStudentsDispatcher} from '../../../store/actions/DISPATCH_HOOK_REGISTRY';
 import ACTION_TYPES from '../../../store/actions/ACTION_TYPES';
+import { AUTH_STATE, STATE } from '../../../store/STATE_DEFINITIONS';
 
 type CreateStudentFormData = {
   first_name: string;
@@ -24,6 +26,8 @@ export default function StudentCreate() {
   const {isLoading, error, sendRequest, clearErrorHandler} = useHttpClient();
 
   const studentsDispatcher = useStudentsDispatcher();
+  
+  const authState: AUTH_STATE = useSelector((state:STATE)=>state.auth);
 
   const onSubmit = handleSubmit(async ({first_name, last_name, batch}) => {
     try {
@@ -36,6 +40,7 @@ export default function StudentCreate() {
           last_name,
           batch,
         },
+        headers: {'Authorization': `Bearer ${authState.jwt}`}
       });
       console.log(results);
       studentsDispatcher(ACTION_TYPES.STUDENTS.CREATE_STUDENT, results.data);
