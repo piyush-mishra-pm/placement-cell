@@ -2,8 +2,6 @@ import * as KEYS from './config/envKeys';
 
 import express, { NextFunction, Request, Response } from 'express';
 import mongoose from 'mongoose';
-import cors from 'cors';
-import cookieParser from 'cookie-parser';
 
 import { configureRouter } from './api/v1/routes';
 import ErrorObject from './utils/ErrorObject';
@@ -21,28 +19,23 @@ const app = express();
 
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json());
-app.use(cookieParser());
 
-const domainsFromEnv = KEYS.FE_ORIGIN || ""
-
-const whitelist = domainsFromEnv.split(",").map(item => item.trim())
-
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin || whitelist.indexOf(origin) !== -1) {
-      callback(null, true)
-    } else {
-      callback(new Error("Not allowed by CORS"))
-    }
-  },
-  credentials: true,
-  optionsSuccessStatus: 200,
-  allowedHeaders: ['Access-Control-Allow-Origin', 'Authorization', 'Content-Type'],
-  methods: ['GET', 'POST', 'DELETE', 'UPDATE', 'PUT', 'PATCH', 'OPTIONS'],
-}
-app.options('*', cors(corsOptions));
-
-app.use(cors(corsOptions))
+// CORS relevant:
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader(
+      'Access-Control-Allow-Headers',
+      'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+  );
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+  
+  // Preflight response OK.
+  // When browser creates an OPTIONS request just before making actual non-GET requests ()like POST, PATCH, DELETE).
+  if(req.method==='OPTIONS'){
+    return res.status(200).end();
+  }
+  next();
+});
 
 import './services/passport';
 app.use(passport.initialize());

@@ -16,16 +16,10 @@ function HeaderNav() {
   const userDispatcher = useUserDispatcher();
   const authDispatcher = useAuthDispatcher();
   const history = useHistory();
-  const {isLoading, error, sendRequest, clearErrorHandler} = useHttpClient();
+  const {isLoading, error, clearErrorHandler} = useHttpClient();
 
   async function onLogoutClickHandler(e: SyntheticEvent) {
     e.preventDefault();
-    try {
-      await sendRequest({successMessage: 'Logout successful!', method: 'POST', url: '/logout', body: {}});
-    } catch (err) {
-      console.error('Error while logging out:', err);
-    }
-    userDispatcher(ACTION_TYPES.USER.RESET_PII, undefined);
     authDispatcher(ACTION_TYPES.AUTH.SIGN_OUT, undefined);
     history.push('/login');
   }

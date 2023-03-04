@@ -110,6 +110,4 @@ export async function reset(req: Request, res: Response, next: NextFunction) {
         console.log(`Error during Reset password mail generation: ${e}`);
         return next(new ErrorObject(500, 'Error during reset password mail generation.'));
     }
-
-    // todo: redirect, or clear cookies? So that tries to login again.
 }

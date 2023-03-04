@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import bcryptjs from 'bcryptjs';
-import {sign, verify} from 'jsonwebtoken';
+import {sign} from 'jsonwebtoken';
 
 import {UserModel} from '../models/UserModel';
 import ErrorObject from '../utils/ErrorObject';
@@ -60,10 +60,9 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     }
 
     // Create JWT:
-    const token = sign({ _id: foundUser._id }, KEYS.JWT_SECRET || 'secret_key');
+    const token = sign({ _id: foundUser._id }, KEYS.JWT_SECRET || 'secret_key', { expiresIn: '1d' });
 
-    // Send JWT in Cookies and body:
-    res.cookie('jwt', token, { sameSite: KEYS.NODE_ENV === 'production' ? 'none' : 'lax', secure: KEYS.NODE_ENV === 'production', maxAge: 24 * 60 * 60 * 1000 }); // 1day expiry
+    // Send JWT body:
     res.status(200).send({
       success: 'true',
       message: 'Successfully logged in!',
@@ -83,30 +82,15 @@ export async function login(req: Request, res: Response, next: NextFunction) {
 
 // todo: token refresh when expired: Redirect to login or refresh token?
 export async function user(req: Request, res: Response, next: NextFunction) {
-  let jwtPayload: any;
   try {
-    const jwtCookie = req.cookies['jwt'];
-    jwtPayload = verify(jwtCookie, KEYS.JWT_SECRET || 'secret_key');
-    if (!jwtPayload) {
-      return next(new ErrorObject(400, 'Unauthenticated user.'));
-    }
-  } catch (e: any) {
-    // refresh token or redirect
-    return next(new ErrorObject(400, 'Either token expired, or Logged out. Try logging in!'));
-  }
-
-  try {
-    const userFound = await UserModel.findOne({_id: jwtPayload._id});
+    const userFound = await UserModel.findOne({_id: req.userData?._id});
     if (!userFound) {
       return next(new ErrorObject(400, 'Unauthenticated! Please register!'));
     }
     const { password, ...restUserDataWithoutPassword } = userFound.toJSON();
-    // todo: no need to pass jwt and userId in body. JWT already in cookies.
-    // Client doesn't need these two fields.
+
     return res.status(200).send({
       success: 'true', message: 'Successfully opened user!', data: {
-        jwt: req.cookies['jwt'],
-        userId: userFound._id,
         first_name: userFound.first_name,
         last_name: userFound.last_name,
         email: userFound.email
@@ -115,10 +99,4 @@ export async function user(req: Request, res: Response, next: NextFunction) {
   } catch (e) {
     next(new ErrorObject(500, 'Something wrong happened while getting user.'));
   }
-}
-
-export async function logout(req: Request, res: Response) {
-  // deleting the JWT cookie.
-  res.cookie('jwt', '', { sameSite: KEYS.NODE_ENV === 'production' ? 'none' : 'lax', secure: KEYS.NODE_ENV === 'production', maxAge: 0 });
-  res.status(200).send({ success: 'true', message: 'Logged out successfully!' });
 }

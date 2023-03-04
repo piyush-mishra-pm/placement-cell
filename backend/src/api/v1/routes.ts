@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
 
-import { login, logout, register, user } from '../../controllers/authController';
+import { login, register, user } from '../../controllers/authController';
 import { forgot, reset } from '../../controllers/forgotController';
 import { studentIdExistInDB, getAllStudents, getStudent, createStudent, updateStudent, deleteStudent } from '../../controllers/studentController';
 import { interviewIdExistInDB, getAllInterviews, getInterview, createInterview, updateInterview, deleteInterview } from '../../controllers/InterviewController';
@@ -11,14 +11,15 @@ import checkRecaptcha from '../../middlewares/checkRecaptcha';
 
 import { validationFactory } from "../../middlewares/validateInputs";
 import { registerValidation, loginValidation, forgotValidation, resetValidation } from "../../models/validationModels";
+import checkAuth from "../../middlewares/checkAuth";
+import envKeys from "../../config/envKeys";
 
 export function configureRouter(router: Router) {
     // Auth Routes:
     router.get('/',(req:Request,res:Response)=> res.send('Welcome'));
-    router.post('/api/v1/register', validationFactory(registerValidation), checkRecaptcha, register);
-    router.post('/api/v1/login', validationFactory(loginValidation), checkRecaptcha, login);
-    router.get('/api/v1/user',user);
-    router.post('/api/v1/logout', logout);
+    router.post('/api/v1/register', validationFactory(registerValidation), checkRecaptcha(envKeys.ENABLE_RECAPTCHA), register);
+    router.post('/api/v1/login', validationFactory(loginValidation), checkRecaptcha(envKeys.ENABLE_RECAPTCHA), login);
+    router.get('/api/v1/user', checkAuth, user);
 
     // Auth Forgot-Rest Password Routes:
     router.post('/api/v1/forgot', validationFactory(forgotValidation), forgot);

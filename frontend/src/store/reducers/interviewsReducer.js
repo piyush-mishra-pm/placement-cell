@@ -8,7 +8,8 @@ export default function interviewsReducer(state = INITIAL_INTERVIEWS_STATE, {typ
   switch (type) {
     case ACTION_TYPES.INTERVIEWS.GET_INTERVIEWS:
       return _.uniqBy(_.union(state, payload), 'id');
-
+    case ACTION_TYPES.AUTH.SIGN_OUT:
+      return INITIAL_INTERVIEWS_STATE;
     default:
       return state;
   }

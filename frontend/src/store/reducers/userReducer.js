@@ -18,6 +18,9 @@ export default function userReducer(state = INITIAL_USER_STATE, {type, payload})
 
     case ACTION_TYPES.USER.RESET_PII:
       return INITIAL_USER_STATE;
+    
+    case ACTION_TYPES.AUTH.SIGN_OUT:
+      return INITIAL_USER_STATE;
 
     default:
       return state;
