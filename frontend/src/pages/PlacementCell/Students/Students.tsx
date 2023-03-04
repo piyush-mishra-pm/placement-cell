@@ -59,16 +59,22 @@ function Students() {
         <StudentCreate />
         <div className="ui list">
           {studentsState.map((student) => (
-            <div className="item" key={`${student.student_id}_${student.interview_id}`}>
-              <div className="header">{`${student.student_id}. ${student.first_name} ${student.last_name}`}</div>
-              batch: {student.batch},<br/>
-              interview_id: {student.interview_id} <br/>
-              company_name: {student.company_name} <br/>
-              interview_name:{student.interview_name} <br/>
-              description:{student.description} <br/>
-              time:{student.time} <br/>
-              interview_status:{student.interview_status} <br/>
-              <i className="trash alternate outline icon" onClick={() => deleteStudent(student.student_id)}></i>
+            <div className="item" key={`${student.student_id}`}>
+              <div className="header">
+                {`id:${student.student_id}: fName:${student.first_name}; lName:${student.last_name}; batch: ${student.batch}`}
+                <i className="trash alternate outline icon" onClick={() => deleteStudent(student.student_id)}></i>
+              </div>
+              {student.interviewData?.map((interview) => (
+                <p key={interview.interview_id}>
+                  interview_id: {interview.interview_id} <br />
+                  company_name: {interview.company_name} <br />
+                  interview_name:{interview.interview_name} <br />
+                  description:{interview.description} <br />
+                  time:{interview.time} <br />
+                  interview_status:{interview.interview_status} <br />
+                  <hr />
+                </p>
+              ))}
             </div>
           ))}
         </div>
