@@ -22,12 +22,7 @@ export interface STUDENT_DATA{
     interviewData?: Array<STUDENT_INTERVIEW>;
 }
 
-export interface STUDENT_INTERVIEW{
-    interview_id?:number;
-    company_name?: string;
-    interview_name?:string;
-    description?:string;
-    time?:number;
+export interface STUDENT_INTERVIEW extends INTERVIEW_PAYLOAD {
     interview_status?:string;
 }
 

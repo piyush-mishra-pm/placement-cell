@@ -38,8 +38,8 @@ function Interviews() {
         <h2>Interviews</h2>
         <div className="ui list">
           {interviewsState.map((interview) => (
-            <div className="item" key={interview.id}>
-              <div className="header">{`${interview.id}. ${interview.company_name}`}</div>
+            <div className="item" key={interview.interview_id}>
+              <div className="header">{`${interview.interview_id}. ${interview.company_name}`}</div>
               {`${interview.interview_name} : ${interview.description} : ${interview.time}`}
             </div>
           ))}

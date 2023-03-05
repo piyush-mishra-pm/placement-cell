@@ -23,9 +23,9 @@ export interface STUDENT_PAYLOAD {
 }
 
 export interface INTERVIEW_PAYLOAD {
-    id: number | null | undefined;
-    company_name: string | null | undefined;
-    interview_name: string | null | undefined;
-    description: string | null | undefined;
-    time: number | null | undefined;
+    interview_id?: number;
+    company_name?: string;
+    interview_name?: string;
+    description?: string;
+    time?: number;
 }

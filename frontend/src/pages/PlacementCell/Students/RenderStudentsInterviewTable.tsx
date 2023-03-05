@@ -6,7 +6,13 @@ import {STATE, STUDENTS_STATE} from '../../../store/STATE_DEFINITIONS';
 
 function RenderStudentsInterviewTable(props: any) {
   const studentsState: STUDENTS_STATE = useSelector((state: STATE) => state.students);
-  const {onDeleteStudent}: {onDeleteStudent: (id?: number) => void} = props;
+  const {
+    onDeleteStudent,
+    onDeleteStudentInterview,
+  }: {
+    onDeleteStudent: (studentId?: number) => void;
+    onDeleteStudentInterview: (studentId?: number, interviewId?: number) => void;
+  } = props;
 
   function renderContent() {
     return (
@@ -37,17 +43,33 @@ function RenderStudentsInterviewTable(props: any) {
                     <td rowSpan={student.interviewData?.length}>
                       {student.student_id}
                       <br />
-                      <i
-                        className="trash alternate outline icon"
-                        onClick={() => onDeleteStudent(student.student_id)}
-                      ></i>
+                      <button className="negative primary button">
+                        <i
+                          className="trash alternate outline icon"
+                          onClick={() => onDeleteStudent(student.student_id)}
+                        ></i>
+                      </button>
                     </td>
                     <td rowSpan={student.interviewData?.length}>{student.first_name}</td>
                     <td rowSpan={student.interviewData?.length}>{student.last_name}</td>
                     <td rowSpan={student.interviewData?.length}>{student.batch}</td>
                   </React.Fragment>
                 )}
-                <td key={_.uniqueId()}>{!interview || !interview.interview_id ? 'NA' : interview.interview_id}</td>
+                <td key={_.uniqueId()}>
+                  {!interview || !interview.interview_id ? (
+                    'NA'
+                  ) : (
+                    <React.Fragment>
+                      {interview.interview_id} :
+                      <button className="negative primary button">
+                        <i
+                          className="trash alternate outline icon"
+                          onClick={() => onDeleteStudentInterview(student.student_id, interview.interview_id)}
+                        ></i>
+                      </button>
+                    </React.Fragment>
+                  )}
+                </td>
                 <td key={_.uniqueId()}>{!interview || !interview.company_name ? 'NA' : interview.company_name}</td>
                 <td key={_.uniqueId()}>{!interview || !interview.interview_name ? 'NA' : interview.interview_name}</td>
                 <td key={_.uniqueId()}>{!interview || !interview.description ? 'NA' : interview.description}</td>

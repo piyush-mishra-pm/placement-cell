@@ -21,7 +21,7 @@ function Students() {
       try {
         const response = await sendRequest({
           successMessage: 'Studenst successfully fetched!',
-          url: '/students/1/10',
+          url: '/students/1/15',
           method: 'GET',
           headers: {Authorization: `Bearer ${authState.jwt}`},
         });
@@ -52,12 +52,42 @@ function Students() {
     })();
   }
 
+  function deleteStudentInterview(studentId: number, interviewId: number) {
+    if (!studentId || !interviewId) {
+      console.error(`studentId ${studentId} or interviewId ${interviewId} is null`);
+    }
+
+    (async () => {
+      try {
+        const response = await sendRequest({
+          successMessage: 'Student Interview session successfully deleted!',
+          url: `/session`,
+          method: 'DELETE',
+          body: {
+            studentId: studentId,
+            interviewId: interviewId,
+          },
+          headers: {'Content-Type': 'application/json', Authorization: `Bearer ${authState.jwt}`},
+        });
+        console.log('API_DELETING_STUDENT_INTERVIEW', response);
+        studentsDispatcher(ACTION_TYPES.STUDENTS.DELETE_STUDENT_INTERVIEW, [
+          {student_id: studentId, interview_id: interviewId},
+        ]);
+      } catch (e: any) {
+        // Don't reset Students Redux state.
+      }
+    })();
+  }
+
   function renderContent() {
     return (
       <div className="ui container">
         <h2>Students</h2>
         <StudentCreate />
-        <RenderStudentsInterviewTable onDeleteStudent={deleteStudent} />
+        <RenderStudentsInterviewTable
+          onDeleteStudent={deleteStudent}
+          onDeleteStudentInterview={deleteStudentInterview}
+        />
       </div>
     );
   }
