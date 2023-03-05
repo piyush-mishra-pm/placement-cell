@@ -14,10 +14,8 @@ function OAuthSuccess() {
   const {isLoading, error, sendRequest, clearErrorHandler} = useHttpClient();
   const userDispatcher = useUserDispatcher();
   const authDispatcher = useAuthDispatcher();
-  console.log('oAuthSucc');
 
   useEffect(() => {
-    console.log('oAuth in useEffect');
     // Request user details only if signed in.
     (async function onLogoutClickHandler() {
       try {
@@ -46,8 +44,6 @@ function OAuthSuccess() {
       toastId: 'oAuth-Success',
     });
   }
-
-  console.log('oAuthSuccPost');
 
   return (
     <React.Fragment>

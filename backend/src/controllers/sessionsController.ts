@@ -61,7 +61,7 @@ export async function getSessionsOfStudent(req: Request, res: Response, next: Ne
     try {
         const results = await pgDb.query(
             `SELECT 
-                st.id as student_id, 
+                st.student_id as student_id, 
                 first_name, last_name, 
                 batch, 
                 ss.interview_id, 
@@ -71,8 +71,8 @@ export async function getSessionsOfStudent(req: Request, res: Response, next: Ne
                 time, 
                 interview_status 
             FROM students AS st 
-            LEFT JOIN sessions ss ON ss.student_id = st.id 
-            LEFT JOIN interviews int ON int.id = ss.interview_id
+            LEFT JOIN sessions ss ON ss.student_id = st.student_id 
+            LEFT JOIN interviews int ON int.interview_id = ss.interview_id
             WHERE student_id=$1
             LIMIT $2 OFFSET $3`,
             [studentId, itemsPerPage, (page - 1) * itemsPerPage]);
@@ -96,7 +96,7 @@ export async function getSessionsOfInterview(req: Request, res: Response, next: 
     try {
         const results = await pgDb.query(
             `SELECT 
-                st.id as student_id, 
+                st.student_id as student_id, 
                 first_name, last_name, 
                 batch, 
                 ss.interview_id, 
@@ -106,8 +106,8 @@ export async function getSessionsOfInterview(req: Request, res: Response, next: 
                 time, 
                 interview_status 
             FROM interviews AS int 
-            LEFT JOIN sessions ss ON int.id = ss.interview_id
-            LEFT JOIN students st ON ss.student_id = st.id 
+            LEFT JOIN sessions ss ON int.interview_id = ss.interview_id
+            LEFT JOIN students st ON ss.student_id = st.student_id 
             WHERE interview_id=$1
             LIMIT $2 OFFSET $3`,
             [interviewId, itemsPerPage, (page - 1) * itemsPerPage]);

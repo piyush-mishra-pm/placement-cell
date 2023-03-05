@@ -12,7 +12,7 @@ export async function getAllStudents(req: Request, res: Response, next: NextFunc
 
         const results = await pgDb.query(
             `SELECT 
-                st.id as student_id, 
+                st.student_id as student_id, 
                 first_name, last_name, 
                 batch, 
                 ss.interview_id, 
@@ -22,8 +22,8 @@ export async function getAllStudents(req: Request, res: Response, next: NextFunc
                 time, 
                 interview_status 
             FROM students AS st 
-            LEFT JOIN sessions ss ON ss.student_id = st.id 
-            LEFT JOIN interviews int ON int.id = ss.interview_id
+            LEFT JOIN sessions ss ON ss.student_id = st.student_id 
+            LEFT JOIN interviews int ON int.interview_id = ss.interview_id
             ORDER BY student_id
             LIMIT $1 OFFSET $2`,
             [itemsPerPage, (page - 1) * itemsPerPage]);
@@ -42,7 +42,7 @@ export async function getAllStudents(req: Request, res: Response, next: NextFunc
 export async function getStudent(req: Request, res: Response, next: NextFunction) {
     const { studentId } = req.params;
     try {
-        const results = await pgDb.query('SELECT * FROM students WHERE id=$1', [studentId]);
+        const results = await pgDb.query('SELECT * FROM students WHERE student_id=$1', [studentId]);
         // todo: append interview details of student as well.
 
         if (results.rows.length === 0) {
@@ -74,7 +74,7 @@ export async function updateStudent(req: Request, res: Response, next: NextFunct
     const { studentId } = req.params;
 
     try {
-        const results = await pgDb.query('UPDATE students SET first_name=$1, last_name=$2, batch=$3 WHERE id=$4', [first_name, last_name, batch, studentId]);
+        const results = await pgDb.query('UPDATE students SET first_name=$1, last_name=$2, batch=$3 WHERE student_id=$4', [first_name, last_name, batch, studentId]);
         return res.status(200).send({ success: 'true', message: 'Updated Student successfully', data: results.rows });
     } catch (e) {
         console.log('Student Update failed: ', e);
@@ -95,7 +95,7 @@ export async function deleteStudent(req: Request, res: Response, next: NextFunct
             [studentId]);
         // Step2: Delete Student details:
         const deleteStudentResults = await pgDb.query(
-            'DELETE FROM students WHERE id=$1 RETURNING *',
+            'DELETE FROM students WHERE student_id=$1 RETURNING *',
             [studentId]);
         // COMMIT Transaction:
         await client.query('COMMIT');
@@ -121,7 +121,7 @@ export async function studentIdExistInDB(req: Request, res: Response, next: Next
             throw new Error("id undefined. Neither in query nor in Params");
         }
         // studentID exists?
-        const studentExistsResults = await pgDb.query('SELECT * FROM students WHERE id=$1', [studentId]);
+        const studentExistsResults = await pgDb.query('SELECT * FROM students WHERE student_id=$1', [studentId]);
         if (studentExistsResults.rows.length === 0) {
             return next(new ErrorObject(400, `Student ID doesn't exist!`));
         } else {

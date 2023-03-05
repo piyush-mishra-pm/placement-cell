@@ -27,7 +27,7 @@ export async function getAllInterviews(req: Request, res: Response, next: NextFu
 export async function getInterview(req: Request, res: Response, next: NextFunction) {
     const { interviewId } = req.params;
     try {
-        const results = await pgDb.query('SELECT * FROM interviews WHERE id=$1', [interviewId]);
+        const results = await pgDb.query('SELECT * FROM interviews WHERE interview_id=$1', [interviewId]);
         // todo: append interview details of Interview as well.
         if (results.rows.length === 0) {
             return next(new ErrorObject(400, 'No such interview found'));
@@ -58,40 +58,11 @@ export async function updateInterview(req: Request, res: Response, next: NextFun
     const { interviewId } = req.params;
 
     try {
-        const results = await pgDb.query('UPDATE interviews SET company_name=$1, interview_name=$2, description=$3, time=$4 WHERE id=$5', [company_name, interview_name, description, time, interviewId]);
+        const results = await pgDb.query('UPDATE interviews SET company_name=$1, interview_name=$2, description=$3, time=$4 WHERE interview_id=$5', [company_name, interview_name, description, time, interviewId]);
         return res.status(200).send({ success: 'true', message: 'Updated Interview successfully', data: results.rows });
     } catch (e) {
         console.log('Interview Update failed: ', e);
         next(new ErrorObject(500, `Something went wrong in updateInterview!${e}`));
-    }
-}
-
-export async function deleteStudent(req: Request, res: Response, next: NextFunction) {
-    const { studentId } = req.params;
-    const client = await pgDb.getClient();
-
-    try {
-        // Transation:
-        await client.query('BEGIN');
-        // Step1: Delete Interview Sessions of Student:
-        const deleteStudentSessionResults = await pgDb.query(
-            'DELETE FROM sessions WHERE student_id=$1',
-            [studentId]);
-
-        // Step2: Delete Student details:
-        const deleteStudentResults = await pgDb.query(
-            'DELETE FROM students WHERE id=$1',
-            [studentId]);
-        // COMMIT Transaction:
-        await client.query('COMMIT');
-        return res.status(200).send({ success: 'true', message: 'Deleted Student Details and Interview-Sessions info  successfully', data: deleteStudentResults.rows });
-    } catch (e) {
-        console.log('Student Deletion failed: ', e);
-        // ROLLBACK Transaction if failure:
-        await client.query('ROLLBACK');
-        next(new ErrorObject(500, `Something went wrong in deleteStudent!${e}`));
-    } finally {
-        client.release();
     }
 }
 
@@ -108,7 +79,7 @@ export async function deleteInterview(req: Request, res: Response, next: NextFun
             [interviewId]);
         // Step2: Delete Interview details:
         const results = await pgDb.query(
-            'DELETE FROM interviews WHERE id=$1',
+            'DELETE FROM interviews WHERE interview_id=$1',
             [interviewId]);
         // COMMIT Transaction:
         await client.query('COMMIT');
@@ -131,7 +102,7 @@ export async function interviewIdExistInDB(req: Request, res: Response, next: Ne
 
     try {
         // InterviewID exists?
-        const interviewExistsResults = await pgDb.query('SELECT * FROM interviews WHERE id=$1', [interviewId]);
+        const interviewExistsResults = await pgDb.query('SELECT * FROM interviews WHERE interview_id=$1', [interviewId]);
         if (interviewExistsResults.rows.length === 0) {
             return next(new ErrorObject(400, `Interview ID ${interviewId} doesn't exist!`));
         } else {

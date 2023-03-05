@@ -32,7 +32,7 @@ export default function StudentCreate() {
   const onSubmit = handleSubmit(async ({first_name, last_name, batch}) => {
     try {
       const results = await sendRequest({
-        successMessage: 'Login successful!',
+        successMessage: 'Created student successfully!',
         url: '/student',
         method: 'POST',
         body: {
@@ -40,9 +40,9 @@ export default function StudentCreate() {
           last_name,
           batch,
         },
-        headers: {'Authorization': `Bearer ${authState.jwt}`}
+        headers: {Authorization: `Bearer ${authState.jwt}`},
       });
-      console.log(results);
+      console.log('API_CREATE_RESULTS', results);
       studentsDispatcher(ACTION_TYPES.STUDENTS.CREATE_STUDENT, results.data);
     } catch (e: any) {
       console.error('error in student creation');

@@ -7,14 +7,14 @@ import {useHttpClient} from '../../../hooks/httpHook';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 import ErrorModal from '../../../components/ErrorModal';
 import {useSelector} from 'react-redux';
-import {AUTH_STATE, STATE, STUDENTS_STATE} from '../../../store/STATE_DEFINITIONS';
+import {AUTH_STATE, STATE} from '../../../store/STATE_DEFINITIONS';
 import StudentCreate from './StudentCreate';
+import RenderStudentsInterviewTable from './RenderStudentsInterviewTable';
 
 function Students() {
   const {isLoading, error, sendRequest, clearErrorHandler} = useHttpClient();
   const studentsDispatcher = useStudentsDispatcher();
-  const studentsState: STUDENTS_STATE = useSelector((state: STATE) => state.students);
-  const authState: AUTH_STATE = useSelector((state:STATE)=>state.auth);
+  const authState: AUTH_STATE = useSelector((state: STATE) => state.auth);
 
   useEffect(() => {
     (async () => {
@@ -23,17 +23,17 @@ function Students() {
           successMessage: 'Studenst successfully fetched!',
           url: '/students/1/10',
           method: 'GET',
-          headers: {'Authorization': `Bearer ${authState.jwt}`}
+          headers: {Authorization: `Bearer ${authState.jwt}`},
         });
-        console.log(response);
+        console.log('API_GETTING_STUDENTS', response);
         studentsDispatcher(ACTION_TYPES.STUDENTS.GET_STUDENTS, response.data);
       } catch (e: any) {
         // Don't reset Students Redux state.
       }
     })();
-  }, [sendRequest, studentsDispatcher,authState.jwt]);
+  }, [sendRequest, studentsDispatcher, authState.jwt]);
 
-  function deleteStudent(studentId: number | null | undefined) {
+  function deleteStudent(studentId?: number) {
     if (!studentId) return;
 
     (async () => {
@@ -42,9 +42,9 @@ function Students() {
           successMessage: 'Student successfully deleted!',
           url: `/student/${studentId}`,
           method: 'DELETE',
-          headers: {'Authorization': `Bearer ${authState.jwt}`}
+          headers: {Authorization: `Bearer ${authState.jwt}`},
         });
-        console.log('Deleting student:', response);
+        console.log('API_DELETING_STUDENT', response);
         studentsDispatcher(ACTION_TYPES.STUDENTS.DELETE_STUDENT, response.data);
       } catch (e: any) {
         // Don't reset Students Redux state.
@@ -57,27 +57,7 @@ function Students() {
       <div className="ui container">
         <h2>Students</h2>
         <StudentCreate />
-        <div className="ui list">
-          {studentsState.map((student) => (
-            <div className="item" key={`${student.student_id}`}>
-              <div className="header">
-                {`id:${student.student_id}: fName:${student.first_name}; lName:${student.last_name}; batch: ${student.batch}`}
-                <i className="trash alternate outline icon" onClick={() => deleteStudent(student.student_id)}></i>
-              </div>
-              {student.interviewData?.map((interview) => (
-                <p key={interview.interview_id}>
-                  interview_id: {interview.interview_id} <br />
-                  company_name: {interview.company_name} <br />
-                  interview_name:{interview.interview_name} <br />
-                  description:{interview.description} <br />
-                  time:{interview.time} <br />
-                  interview_status:{interview.interview_status} <br />
-                  <hr />
-                </p>
-              ))}
-            </div>
-          ))}
-        </div>
+        <RenderStudentsInterviewTable onDeleteStudent={deleteStudent} />
       </div>
     );
   }

@@ -24,7 +24,7 @@ function Interviews() {
           method: 'GET',
           headers: {'Authorization': `Bearer ${authState.jwt}`}
         });
-        console.log(response);
+        console.log('API_GET_INTERVIEWS', response);
         interviewsDispatcher(ACTION_TYPES.INTERVIEWS.GET_INTERVIEWS, response.data);
       } catch (e: any) {
         // Don't reset Students Redux state.

@@ -7,14 +7,14 @@ import { STUDENTS_STATE, STUDENT_DATA, STUDENT_INTERVIEW } from '../STATE_DEFINI
 const INITIAL_STUDENTS_STATE: Array<STUDENT_DATA> = [];
 
 export default function studentsReducer(state = INITIAL_STUDENTS_STATE, { type, payload }: { type: any, payload: Array<STUDENT_PAYLOAD> }) {
-  console.log(payload, type);
+  console.log('ACTION', { type, payload });
   switch (type) {
     case ACTION_TYPES.STUDENTS.GET_STUDENTS:
       return getMapKeyedAndAggregatedStudentsAll(payload);
     case ACTION_TYPES.STUDENTS.CREATE_STUDENT:
-      return _.cloneDeep(concatStudent(state, payload[0]));
+      return addStudentToKey(_.cloneDeep(state), payload[0]);
     case ACTION_TYPES.STUDENTS.DELETE_STUDENT:
-      return _.reject(_.cloneDeep(state), { id: payload[0].student_id });
+      return _.cloneDeep(state).filter(st => st.student_id !== payload[0].student_id);
     case ACTION_TYPES.AUTH.SIGN_OUT:
       return INITIAL_STUDENTS_STATE;
     default:
@@ -28,36 +28,31 @@ function getMapKeyedAndAggregatedStudentsAll(payload: Array<STUDENT_PAYLOAD>): A
   for (const student of payload) {
     newStudentsMap = addStudentToKey(newStudentsMap, student);
   }
-  console.log(newStudentsMap);
+
   return newStudentsMap;
 }
 
-function concatStudent(state: Array<STUDENT_DATA>, payload: STUDENT_PAYLOAD): Array<STUDENT_DATA> {
-  state = _.cloneDeep(state);
-  state = addStudentToKey(state, payload);
-  return state;
-}
-
-function addStudentToKey(newStudentsMap: Array<STUDENT_DATA>, student: STUDENT_PAYLOAD): Array<STUDENT_DATA> {
-  console.log(student, newStudentsMap);
+function addStudentToKey(state: Array<STUDENT_DATA>, student: STUDENT_PAYLOAD): Array<STUDENT_DATA> {
   // Student ID exists:
   if (!student.student_id)
-    return newStudentsMap;
+    return state;
+
+  const isInterviewDataPresent = !!student.interview_id;
 
   // Construct Interview data:
   const interviewDataArray: STUDENT_INTERVIEW = {
-    interview_id: student.interview_id,
-    company_name: student.company_name,
-    interview_name: student.interview_name,
-    description: student.description,
-    time: student.time,
-    interview_status: student.interview_status,
+    interview_id: student.interview_id || undefined,
+    company_name: student.company_name || undefined,
+    interview_name: student.interview_name || undefined,
+    description: student.description || undefined,
+    time: student.time || undefined,
+    interview_status: student.interview_status || undefined,
   };
 
   // Student ID exists as key:
-  let foundStudent = newStudentsMap.find(st => st.student_id === student.student_id);
+  const foundStudent = state.find((st) => st.student_id === student.student_id);
   if (!foundStudent) {
-    newStudentsMap.push({
+    state.push({
       student_id: student.student_id,
       first_name: student.first_name,
       last_name: student.last_name,
@@ -70,5 +65,5 @@ function addStudentToKey(newStudentsMap: Array<STUDENT_DATA>, student: STUDENT_P
     foundStudent.interviewData?.push(interviewDataArray);
   }
 
-  return newStudentsMap;
+  return state;
 }
