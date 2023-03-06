@@ -9,17 +9,20 @@ export interface USER_PAYLOAD {
     email: string | null | undefined;
 }
 
-export interface STUDENT_PAYLOAD {
-    student_id?: number;
-    first_name?: string;
-    last_name?: string;
-    batch?: string;
+export interface STUDENT_PAYLOAD extends STUDENT_PII_PAYLOAD {
     interview_id?:number;
     company_name?: string;
     interview_name?:string;
     description?:string;
     time?:number;
     interview_status?:string;
+}
+
+export interface STUDENT_PII_PAYLOAD {
+    student_id?: number;
+    first_name?: string;
+    last_name?: string;
+    batch?: string;
 }
 
 export interface INTERVIEW_PAYLOAD {

@@ -9,6 +9,7 @@ const client = redis.createClient({
 
 const setAsyncExPromise = promisify(client.setex).bind(client);
 const getAsyncPromise = promisify(client.get).bind(client);
+const delAsyncPromise = promisify(client.del).bind(client);
 
 client.on('error', err => {
     console.log('Error in redis client: ' + err);
@@ -16,6 +17,10 @@ client.on('error', err => {
 
 export async function redisSaveWithTtl(key: string, value: any, ttlSeconds: number = 60) {
     return await setAsyncExPromise(key, ttlSeconds, JSON.stringify(value));
+}
+
+export async function redisDeleteKey(key: string) {
+    return await delAsyncPromise(key);
 }
 
 export async function redisGet(key: string) {

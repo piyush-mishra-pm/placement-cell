@@ -74,13 +74,13 @@ end
 ```mermaid
 erDiagram
   Student {
-    int id PK
+    int student_id PK
     string first_name
     string last_name
     string batch
   }
   Interview {
-    int id PK
+    int interview_id PK
     string company_name
     date interview_date
   }
@@ -144,5 +144,5 @@ npm start
 - ❌ Validation for path params, body.
 - ✅ Redis caching in Get (Student, Interviews and Sessions).
 - ❌ Redis caching in Auth.
-- ❌ Redis caching in create, update and delete as well.
+- ❌ Redis caching in create, update and delete as well. (Cache Invalidation issue.)
 - ❌ Modal when fetching list of Students, Interviews, Jobs, etc.

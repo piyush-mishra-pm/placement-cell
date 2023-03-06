@@ -2,12 +2,18 @@ import { NextFunction, Request, Response } from 'express';
 
 import pgDb from '../db/pg';
 import ErrorObject from '../utils/ErrorObject';
-import { redisSaveWithTtl } from '../db/redis';
+import { redisSaveWithTtl, redisDeleteKey } from '../db/redis';
 import { getRedisKey, REDIS_QUERY_TYPE } from '../db/redisHelper';
 
 export async function createSession(req: Request, res: Response, next: NextFunction) {
-    const { studentId, interviewId, interviewStatus } = req.body;
+    const studentId = req.params.studentId || req.query.studentId || req.body.studentId;
+    const interviewId = req.params.interviewId || req.query.interviewId || req.body.interviewId;
+    const interviewStatus = req.params.interviewStatus || req.query.interviewStatus || req.body.interviewStatus;
+
     try {
+        if (!studentId || !interviewId || !interviewStatus) {
+            throw new Error("studentId, or interviewId, or interviewStatus is undefined/null. Cant create session.");
+        }
         const results = await pgDb.query(
             `INSERT INTO sessions(student_id, interview_id, interview_status)
                 SELECT $1, $2, $3
@@ -24,12 +30,16 @@ export async function createSession(req: Request, res: Response, next: NextFunct
 }
 
 export async function getSession(req: Request, res: Response, next: NextFunction) {
-    const { studentId, interviewId } = req.body;
+    const studentId = req.params.studentId || req.query.studentId || req.body.studentId;
+    const interviewId = req.params.interviewId || req.query.interviewId || req.body.interviewId;
 
     try {
+        if (!studentId || !interviewId) {
+            throw new Error("studentId, or interviewId is undefined/null. Cant get session.");
+        }
         const results = await pgDb.query(
             `SELECT 
-                st.id as student_id, 
+                st.student_id as student_id, 
                 first_name, last_name, 
                 batch, 
                 ss.interview_id, 
@@ -39,9 +49,9 @@ export async function getSession(req: Request, res: Response, next: NextFunction
                 time, 
                 interview_status 
             FROM students AS st 
-            LEFT JOIN sessions ss ON ss.student_id = st.id 
-            LEFT JOIN interviews int ON int.id = ss.interview_id
-            WHERE student_id=$1 AND interview_id=$2`,
+            LEFT JOIN sessions ss ON ss.student_id = st.student_id
+            LEFT JOIN interviews int ON int.interview_id = ss.interview_id
+            WHERE ss.student_id=$1 AND ss.interview_id=$2`,
             [studentId, interviewId]);
         if (results.rows.length === 0) {
             return next(new ErrorObject(400, 'No such interview session exists.'));
@@ -55,10 +65,14 @@ export async function getSession(req: Request, res: Response, next: NextFunction
 }
 
 export async function getSessionsOfStudent(req: Request, res: Response, next: NextFunction) {
-    const { studentId } = req.params;
+    const studentId = req.params.studentId || req.query.studentId || req.body.studentId;
     const page = parseInt(req.params.page);
     const itemsPerPage = parseInt(req.params.itemsPerPage);
     try {
+        if (!studentId || !page || itemsPerPage || isNaN(page) || isNaN(itemsPerPage)) {
+            throw new Error("studentId, page or itemsPerPage is undefined/null. Cant get sessions of student.");
+        }
+
         const results = await pgDb.query(
             `SELECT 
                 st.student_id as student_id, 
@@ -73,7 +87,7 @@ export async function getSessionsOfStudent(req: Request, res: Response, next: Ne
             FROM students AS st 
             LEFT JOIN sessions ss ON ss.student_id = st.student_id 
             LEFT JOIN interviews int ON int.interview_id = ss.interview_id
-            WHERE student_id=$1
+            WHERE ss.student_id=$1
             LIMIT $2 OFFSET $3`,
             [studentId, itemsPerPage, (page - 1) * itemsPerPage]);
         if (results.rows.length === 0) {
@@ -89,11 +103,15 @@ export async function getSessionsOfStudent(req: Request, res: Response, next: Ne
 }
 
 export async function getSessionsOfInterview(req: Request, res: Response, next: NextFunction) {
-    const { interviewId } = req.params;
+    const interviewId = req.params.interviewId || req.query.interviewId || req.body.interviewId;
     const page = parseInt(req.params.page);
     const itemsPerPage = parseInt(req.params.itemsPerPage);
 
     try {
+        if (!interviewId || !page || itemsPerPage || isNaN(page) || isNaN(itemsPerPage)) {
+            throw new Error("interviewId, page or itemsPerPage is undefined/null. Cant get sessions of interview.");
+        }
+
         const results = await pgDb.query(
             `SELECT 
                 st.student_id as student_id, 
@@ -108,7 +126,7 @@ export async function getSessionsOfInterview(req: Request, res: Response, next: 
             FROM interviews AS int 
             LEFT JOIN sessions ss ON int.interview_id = ss.interview_id
             LEFT JOIN students st ON ss.student_id = st.student_id 
-            WHERE interview_id=$1
+            WHERE ss.interview_id=$1
             LIMIT $2 OFFSET $3`,
             [interviewId, itemsPerPage, (page - 1) * itemsPerPage]);
         if (results.rows.length === 0) {
@@ -124,12 +142,21 @@ export async function getSessionsOfInterview(req: Request, res: Response, next: 
 }
 
 export async function updateSessionStatus(req: Request, res: Response, next: NextFunction) {
-    const { studentId, interviewId, interviewStatus } = req.body;
+    const studentId = req.params.studentId || req.query.studentId || req.body.studentId;
+    const interviewId = req.params.interviewId || req.query.interviewId || req.body.interviewId;
+    const interviewStatus = req.params.interviewStatus || req.query.interviewStatus || req.body.interviewStatus;
 
     try {
+        if (!studentId || !interviewId || !interviewStatus) {
+            throw new Error("studentId, or interviewId, or interviewStatus is undefined/null. Cant update session status.");
+        }
         const results = await pgDb.query(
             'UPDATE sessions SET interview_status=$3 WHERE student_id=$1 AND interview_id=$2',
             [studentId, interviewId, interviewStatus]);
+        await redisDeleteKey(getRedisKey(REDIS_QUERY_TYPE.SESSIONS_OF_STUDENT_ID, req));
+        await redisDeleteKey(getRedisKey(REDIS_QUERY_TYPE.SESSIONS_OF_INTERVIEW_ID, req));
+        await redisDeleteKey(getRedisKey(REDIS_QUERY_TYPE.SESSION_GET, req));
+        await redisDeleteKey(getRedisKey(REDIS_QUERY_TYPE.STUDENTS_GET, req));
         return res.status(200).send({ success: 'true', message: 'Updated session status successfully', data: results.rows });
     } catch (e) {
         console.log('Updating Session status failed: ', e);
@@ -138,13 +165,20 @@ export async function updateSessionStatus(req: Request, res: Response, next: Nex
 }
 
 export async function deleteSession(req: Request, res: Response, next: NextFunction) {
-    const { studentId, interviewId } = req.body;
+    const studentId = req.params.studentId || req.query.studentId || req.body.studentId;
+    const interviewId = req.params.interviewId || req.query.interviewId || req.body.interviewId;
 
     // todo: add transaction for deleting session.
     try {
+        if (!studentId || !interviewId) {
+            throw new Error("studentId, or interviewId is undefined/null. Cant delete session status.");
+        }
         const results = await pgDb.query(
             'DELETE FROM sessions WHERE student_id=$1 AND interview_id=$2',
             [studentId, interviewId]);
+        await redisDeleteKey(getRedisKey(REDIS_QUERY_TYPE.SESSIONS_OF_STUDENT_ID, req));
+        await redisDeleteKey(getRedisKey(REDIS_QUERY_TYPE.SESSIONS_OF_INTERVIEW_ID, req));
+        await redisDeleteKey(getRedisKey(REDIS_QUERY_TYPE.SESSION_GET, req));
         return res.status(200).send({ success: 'true', message: 'Delete session status successfully', data: results.rows });
     } catch (e) {
         console.log('Deleting Session failed: ', e);
@@ -155,7 +189,9 @@ export async function deleteSession(req: Request, res: Response, next: NextFunct
 export function sessionExists(allowExistence: boolean) {
 
     return async (req: Request, res: Response, next: NextFunction) => {
-        const { studentId, interviewId } = req.body;
+        const studentId = req.params.studentId || req.query.studentId || req.body.studentId;
+        const interviewId = req.params.interviewId || req.query.interviewId || req.body.interviewId;
+
         try {
             if (!studentId || !interviewId) {
                 throw new Error("ID of Student or Interview is missing in body.");

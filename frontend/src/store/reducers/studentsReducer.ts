@@ -19,6 +19,10 @@ export default function studentsReducer(state = INITIAL_STUDENTS_STATE, { type, 
       return deleteStudentInterview(_.cloneDeep(state), payload[0]);
     case ACTION_TYPES.AUTH.SIGN_OUT:
       return INITIAL_STUDENTS_STATE;
+    case ACTION_TYPES.SESSION.CREATE_SESSION:
+      return state;
+    case ACTION_TYPES.SESSION.EDIT_SESSION:
+      return modifySessionStatus(_.cloneDeep(state), payload[0]);
     default:
       return state;
   }
@@ -38,8 +42,6 @@ function addStudentToKey(state: Array<STUDENT_DATA>, student: STUDENT_PAYLOAD): 
   // Student ID exists:
   if (!student.student_id)
     return state;
-
-  const isInterviewDataPresent = !!student.interview_id;
 
   // Construct Interview data:
   const interviewDataArray: STUDENT_INTERVIEW = {
@@ -84,6 +86,24 @@ function deleteStudentInterview(state: Array<STUDENT_DATA>, student: STUDENT_PAY
       interview_status: undefined,
     }];
   }
+
+  return state;
+}
+
+function modifySessionStatus(state: Array<STUDENT_DATA>, session: STUDENT_PAYLOAD): Array<STUDENT_DATA> {
+  const foundStudent = state.find(st => st.student_id === session.student_id);
+  if (!foundStudent) {
+    console.error('Couldnt find student, cant update interview status.');
+    return state;
+  }
+
+  const foundInterview = foundStudent.interviewData?.find(int => int.interview_id === session.interview_id);
+  if (!foundInterview) {
+    console.error('Couldnt find interview, cant update interview status.');
+    return state;
+  }
+
+  foundInterview.interview_status = session.interview_status;
 
   return state;
 }

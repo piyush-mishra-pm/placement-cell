@@ -23,7 +23,7 @@ export interface STUDENT_DATA{
 }
 
 export interface STUDENT_INTERVIEW extends INTERVIEW_PAYLOAD {
-    interview_status?:string;
+    interview_status?: string;// todo: change to INTERVIEW_STATE
 }
 
 export interface INTERVIEWS_STATE extends Array<INTERVIEW_PAYLOAD> { }
@@ -33,3 +33,13 @@ export interface STATE {
     students: STUDENTS_STATE;
     interviews: INTERVIEWS_STATE;
 }
+
+export enum INTERVIEW_STATUS {
+    ON_HOLD = 'ON-HOLD',
+    NO_ATTEMPT = 'NOT-ATTEMPTED',
+    CLEARED = 'CLEARED',
+    FAILED = 'FAILED',
+    DISQUALIFIED = 'DISQUALIFIED',
+}
+
+export type INTERVIEW_STATUS_VALUES = keyof typeof INTERVIEW_STATUS;

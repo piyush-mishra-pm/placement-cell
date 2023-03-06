@@ -1,5 +1,6 @@
 import React from 'react';
 import {useSelector} from 'react-redux';
+import {Link} from 'react-router-dom';
 import _ from 'lodash';
 
 import {STATE, STUDENTS_STATE} from '../../../store/STATE_DEFINITIONS';
@@ -43,12 +44,18 @@ function RenderStudentsInterviewTable(props: any) {
                     <td rowSpan={student.interviewData?.length}>
                       {student.student_id}
                       <br />
-                      <button className="negative primary button">
-                        <i
-                          className="trash alternate outline icon"
-                          onClick={() => onDeleteStudent(student.student_id)}
-                        ></i>
+                      <button
+                        className="ui negative primary button"
+                        onClick={() => onDeleteStudent(student.student_id)}
+                      >
+                        <i className="trash alternate outline icon"></i>
+                        Delete Student
                       </button>
+                      <br />
+                      <Link to={`/session/create/${student.student_id}`} className="ui positive primary button">
+                        <i className="calendar plus outline icon"></i>
+                        Add Session
+                      </Link>
                     </td>
                     <td rowSpan={student.interviewData?.length}>{student.first_name}</td>
                     <td rowSpan={student.interviewData?.length}>{student.last_name}</td>
@@ -61,11 +68,12 @@ function RenderStudentsInterviewTable(props: any) {
                   ) : (
                     <React.Fragment>
                       {interview.interview_id} :
-                      <button className="negative primary button">
+                      <button className="ui negative primary button">
                         <i
-                          className="trash alternate outline icon"
+                          className="calendar minus outline icon"
                           onClick={() => onDeleteStudentInterview(student.student_id, interview.interview_id)}
                         ></i>
+                        Delete Session
                       </button>
                     </React.Fragment>
                   )}
@@ -74,7 +82,19 @@ function RenderStudentsInterviewTable(props: any) {
                 <td key={_.uniqueId()}>{!interview || !interview.interview_name ? 'NA' : interview.interview_name}</td>
                 <td key={_.uniqueId()}>{!interview || !interview.description ? 'NA' : interview.description}</td>
                 <td key={_.uniqueId()}>{!interview || !interview.time ? 'NA' : interview.time}</td>
-                <td key={_.uniqueId()}>{!interview || !interview.interview_id ? 'NA' : interview.interview_status}</td>
+                <td key={_.uniqueId()}>
+                  {!interview || !interview.interview_id ? 'NA' : interview.interview_status}
+                  <br />
+                  {interview && interview.interview_id && (
+                    <Link
+                      to={`/session/edit/${student.student_id}/${interview.interview_id}`}
+                      className="ui secondary button"
+                    >
+                      <i className="edit alternate outline icon"></i>
+                      Edit Status
+                    </Link>
+                  )}
+                </td>
               </tr>
             ))
           )}

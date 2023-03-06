@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 
 import pgDb from '../db/pg';
 import ErrorObject from '../utils/ErrorObject';
-import { redisSaveWithTtl } from '../db/redis';
+import { redisDeleteKey, redisSaveWithTtl } from '../db/redis';
 import { getRedisKey, REDIS_QUERY_TYPE } from '../db/redisHelper';
 
 export async function getAllStudents(req: Request, res: Response, next: NextFunction) {
@@ -24,7 +24,7 @@ export async function getAllStudents(req: Request, res: Response, next: NextFunc
             FROM students AS st 
             LEFT JOIN sessions ss ON ss.student_id = st.student_id 
             LEFT JOIN interviews int ON int.interview_id = ss.interview_id
-            ORDER BY student_id
+            ORDER BY ss.student_id
             LIMIT $1 OFFSET $2`,
             [itemsPerPage, (page - 1) * itemsPerPage]);
 
@@ -75,6 +75,8 @@ export async function updateStudent(req: Request, res: Response, next: NextFunct
 
     try {
         const results = await pgDb.query('UPDATE students SET first_name=$1, last_name=$2, batch=$3 WHERE student_id=$4', [first_name, last_name, batch, studentId]);
+        await redisDeleteKey(getRedisKey(REDIS_QUERY_TYPE.STUDENT_GET, req));
+        await redisDeleteKey(getRedisKey(REDIS_QUERY_TYPE.STUDENT_ID_EXISTS, req));
         return res.status(200).send({ success: 'true', message: 'Updated Student successfully', data: results.rows });
     } catch (e) {
         console.log('Student Update failed: ', e);
@@ -100,6 +102,8 @@ export async function deleteStudent(req: Request, res: Response, next: NextFunct
         // COMMIT Transaction:
         await client.query('COMMIT');
 
+        await redisDeleteKey(getRedisKey(REDIS_QUERY_TYPE.STUDENT_ID_EXISTS, req));
+        await redisDeleteKey(getRedisKey(REDIS_QUERY_TYPE.STUDENT_GET, req));
         return res.status(200).send({ success: 'true', message: 'Deleted Student Details and Interview-Sessions info  successfully', data: deleteStudentResults.rows });
     } catch (e) {
         // ROLLBACK Transaction if failure:

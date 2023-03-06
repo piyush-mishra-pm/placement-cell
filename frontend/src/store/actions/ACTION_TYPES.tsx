@@ -18,6 +18,13 @@ const ACTION_TYPES = {
     DELETE_STUDENT_INTERVIEW: 'DELETE_STUDENT_INTERVIEW',
   },
 
+  SESSION: {
+    // Unique entity comprised of a student and an interview.
+    CREATE_SESSION: 'CREATE_SESSION',
+    DELETE_SESSION: 'DELETE_SESSION',
+    EDIT_SESSION: 'EDIT_SESSION',
+  },
+
   INTERVIEWS: {
     GET_INTERVIEWS: 'GET_INTERVIEWS',
   },

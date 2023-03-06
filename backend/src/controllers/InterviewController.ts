@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 
 import pgDb from '../db/pg';
 import ErrorObject from '../utils/ErrorObject';
-import { redisSaveWithTtl } from '../db/redis';
+import { redisDeleteKey, redisSaveWithTtl } from '../db/redis';
 import { getRedisKey, REDIS_QUERY_TYPE } from '../db/redisHelper';
 
 export async function getAllInterviews(req: Request, res: Response, next: NextFunction) {
@@ -59,6 +59,8 @@ export async function updateInterview(req: Request, res: Response, next: NextFun
 
     try {
         const results = await pgDb.query('UPDATE interviews SET company_name=$1, interview_name=$2, description=$3, time=$4 WHERE interview_id=$5', [company_name, interview_name, description, time, interviewId]);
+        await redisDeleteKey(getRedisKey(REDIS_QUERY_TYPE.INTERVIEW_GET, req));
+        await redisDeleteKey(getRedisKey(REDIS_QUERY_TYPE.INTERVIEW_ID_EXISTS, req));
         return res.status(200).send({ success: 'true', message: 'Updated Interview successfully', data: results.rows });
     } catch (e) {
         console.log('Interview Update failed: ', e);
@@ -83,6 +85,9 @@ export async function deleteInterview(req: Request, res: Response, next: NextFun
             [interviewId]);
         // COMMIT Transaction:
         await client.query('COMMIT');
+
+        await redisDeleteKey(getRedisKey(REDIS_QUERY_TYPE.INTERVIEW_GET, req));
+        await redisDeleteKey(getRedisKey(REDIS_QUERY_TYPE.INTERVIEW_ID_EXISTS, req));
 
         return res.status(200).send({ success: 'true', message: 'Deleted Interview successfully', data: results.rows });
     } catch (e) {

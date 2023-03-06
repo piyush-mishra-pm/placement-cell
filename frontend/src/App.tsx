@@ -18,6 +18,7 @@ import Interviews from './pages/PlacementCell/Interviews/Interviews';
 
 import './App.css';
 import Reports from './pages/PlacementCell/Reports';
+import EditSession from './pages/PlacementCell/Sessions/EditSession';
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
           <Route path="/login-success/:token" exact component={OAuthSuccess} />
           <Route path="/students" exact component={Students} />
           <Route path="/interviews" exact component={Interviews} />
+          <Route path="/session/edit/:studentId/:interviewId" exact component={EditSession} />
           <Route path="/reports" exact component={Reports} />
           <Route path="/" exact component={Home} />
           <Route path="*" component={NotFound} />

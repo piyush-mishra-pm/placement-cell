@@ -49,7 +49,7 @@ export function configureRouter(router: Router) {
         interviewIdExistInDB,
         useCacheIfStored(REDIS_QUERY_TYPE.SESSIONS_OF_INTERVIEW_ID),
         getSessionsOfInterview);
-    router.get('/api/v1/session',
+    router.get('/api/v1/session/:studentId?/:interviewId?',
         checkAuth,
         studentIdExistInDB,
         interviewIdExistInDB,
