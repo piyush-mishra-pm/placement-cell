@@ -4,7 +4,7 @@ import { login, register, user } from '../../controllers/authController';
 import { forgot, reset } from '../../controllers/forgotController';
 import { studentIdExistInDB, getAllStudents, getStudent, createStudent, updateStudent, deleteStudent } from '../../controllers/studentController';
 import { interviewIdExistInDB, getAllInterviews, getInterview, createInterview, updateInterview, deleteInterview } from '../../controllers/InterviewController';
-import { sessionExists, createSession, getSession, getSessionsOfStudent, getSessionsOfInterview, updateSessionStatus, deleteSession } from '../../controllers/sessionsController';
+import { sessionExists, createSession, getSession, getSessionsOfStudent, getSessionsAvailabaleForStudentToTake, getSessionsOfInterview, updateSessionStatus, deleteSession } from '../../controllers/sessionsController';
 import { REDIS_QUERY_TYPE, useCacheIfStored } from "../../db/redisHelper";
 
 import checkRecaptcha from '../../middlewares/checkRecaptcha';
@@ -44,6 +44,11 @@ export function configureRouter(router: Router) {
         studentIdExistInDB,
         useCacheIfStored(REDIS_QUERY_TYPE.SESSIONS_OF_STUDENT_ID),
         getSessionsOfStudent);
+    router.get('/api/v1/sessions/student/available/:studentId/:page/:itemsPerPage',
+        checkAuth,
+        studentIdExistInDB,
+        useCacheIfStored(REDIS_QUERY_TYPE.SESSIONS_AVAILABLE_FOR_STUDENT_TO_TAKE),
+        getSessionsAvailabaleForStudentToTake);
     router.get('/api/v1/sessions/interview/:interviewId/:page/:itemsPerPage',
         checkAuth,
         interviewIdExistInDB,

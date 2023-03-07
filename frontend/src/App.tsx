@@ -19,6 +19,7 @@ import Interviews from './pages/PlacementCell/Interviews/Interviews';
 import './App.css';
 import Reports from './pages/PlacementCell/Reports';
 import EditSession from './pages/PlacementCell/Sessions/EditSession';
+import CreateSession from './pages/PlacementCell/Sessions/CreateSession';
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
           <Route path="/students" exact component={Students} />
           <Route path="/interviews" exact component={Interviews} />
           <Route path="/session/edit/:studentId/:interviewId" exact component={EditSession} />
+          <Route path="/session/create/:studentId" exact component={CreateSession} />
           <Route path="/reports" exact component={Reports} />
           <Route path="/" exact component={Home} />
           <Route path="*" component={NotFound} />

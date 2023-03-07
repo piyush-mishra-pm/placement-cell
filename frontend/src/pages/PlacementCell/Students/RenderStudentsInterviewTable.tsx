@@ -68,11 +68,11 @@ function RenderStudentsInterviewTable(props: any) {
                   ) : (
                     <React.Fragment>
                       {interview.interview_id} :
-                      <button className="ui negative primary button">
-                        <i
-                          className="calendar minus outline icon"
-                          onClick={() => onDeleteStudentInterview(student.student_id, interview.interview_id)}
-                        ></i>
+                      <button
+                        className="ui negative primary button"
+                        onClick={() => onDeleteStudentInterview(student.student_id, interview.interview_id)}
+                      >
+                        <i className="calendar minus outline icon"></i>
                         Delete Session
                       </button>
                     </React.Fragment>

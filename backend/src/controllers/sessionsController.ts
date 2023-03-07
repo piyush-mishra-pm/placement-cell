@@ -69,7 +69,7 @@ export async function getSessionsOfStudent(req: Request, res: Response, next: Ne
     const page = parseInt(req.params.page);
     const itemsPerPage = parseInt(req.params.itemsPerPage);
     try {
-        if (!studentId || !page || itemsPerPage || isNaN(page) || isNaN(itemsPerPage)) {
+        if (!studentId || !page || !itemsPerPage || isNaN(page) || isNaN(itemsPerPage)) {
             throw new Error("studentId, page or itemsPerPage is undefined/null. Cant get sessions of student.");
         }
 
@@ -102,13 +102,43 @@ export async function getSessionsOfStudent(req: Request, res: Response, next: Ne
     }
 }
 
+export async function getSessionsAvailabaleForStudentToTake(req: Request, res: Response, next: NextFunction) {
+    const studentId = req.params.studentId || req.query.studentId || req.body.studentId;
+    const page = parseInt(req.params.page);
+    const itemsPerPage = parseInt(req.params.itemsPerPage);
+    try {
+        if (!studentId || !page || !itemsPerPage || isNaN(page) || isNaN(itemsPerPage)) {
+            throw new Error(`studentId, page or itemsPerPage is undefined/null. Cant get sessions available for student to take.`);
+        }
+
+        const results = await pgDb.query(
+            `SELECT * 
+            FROM interviews 
+            WHERE interview_id 
+                NOT IN (SELECT DISTINCT interview_id 
+                        FROM sessions 
+                        WHERE student_id=$1) 
+            LIMIT $2 OFFSET $3;`,
+            [studentId, itemsPerPage, (page - 1) * itemsPerPage]);
+        if (results.rows.length === 0) {
+            return next(new ErrorObject(400, 'No available sessions for the student.'));
+        }
+        // Save in Cache:
+        await redisSaveWithTtl(getRedisKey(REDIS_QUERY_TYPE.SESSIONS_AVAILABLE_FOR_STUDENT_TO_TAKE, req), results.rows, 10);
+        return res.status(200).send({ success: 'true', message: 'Fetched Sessions of student successfully', data: results.rows });
+    } catch (e) {
+        console.log('Fetching Student Avaiblable Session to take, failed: ', e);
+        next(new ErrorObject(500, `Something went wrong in getSessionsAvailabaleForStudentToTake!${e}`));
+    }
+}
+
 export async function getSessionsOfInterview(req: Request, res: Response, next: NextFunction) {
     const interviewId = req.params.interviewId || req.query.interviewId || req.body.interviewId;
     const page = parseInt(req.params.page);
     const itemsPerPage = parseInt(req.params.itemsPerPage);
 
     try {
-        if (!interviewId || !page || itemsPerPage || isNaN(page) || isNaN(itemsPerPage)) {
+        if (!interviewId || !page || !itemsPerPage || isNaN(page) || isNaN(itemsPerPage)) {
             throw new Error("interviewId, page or itemsPerPage is undefined/null. Cant get sessions of interview.");
         }
 

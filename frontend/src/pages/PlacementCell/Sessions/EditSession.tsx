@@ -212,7 +212,7 @@ function EditSession() {
   if (error && error !== 'canceled') {
     toast(error, {
       type: 'error',
-      toastId: 'Sessioms-Create-Toast',
+      toastId: 'Sessioms-Edit-Toast',
     });
   }
 
