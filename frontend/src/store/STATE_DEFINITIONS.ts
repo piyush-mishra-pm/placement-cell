@@ -1,4 +1,4 @@
-import { STUDENT_PAYLOAD, INTERVIEW_PAYLOAD, STUDENT_PII_PAYLOAD } from "./PAYLOAD_DEFINITIONS";
+import { INTERVIEW_PAYLOAD, STUDENT_PII_PAYLOAD } from "./PAYLOAD_DEFINITIONS";
 
 export interface AUTH_STATE {
     isSignedIn: boolean | null | undefined;
@@ -34,7 +34,7 @@ export interface STUDENT_INTERVIEW extends INTERVIEW_PAYLOAD {
     interview_status?: string;// todo: change to INTERVIEW_STATE
 }
 
-export interface INTERVIEWS_STATE extends Array<INTERVIEW_PAYLOAD> { }
+export interface INTERVIEWS_STATE extends Array<INTERVIEW_DATA> { }
 export interface STATE {
     auth: AUTH_STATE;
     user: USER_STATE;

@@ -41,7 +41,7 @@ function getMapKeyedAndAggregatedInterviewsAll(payload: Array<INTERVIEW_STUDENT_
 
 function addInterviewToKey(state: Array<INTERVIEW_DATA>, interview: INTERVIEW_STUDENT_PAYLOAD): Array<INTERVIEW_DATA> {
   // Student ID exists:
-  if (!interview.student_id)
+  if (!interview.interview_id)
     return state;
 
   // Construct Interview data:

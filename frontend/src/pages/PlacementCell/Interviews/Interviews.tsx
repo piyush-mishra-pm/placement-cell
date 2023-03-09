@@ -33,21 +33,78 @@ function Interviews() {
     })();
   }, [sendRequest, interviewsDispatcher, authState.jwt]);
 
-  if (error && error !== 'canceled') {
-    toast(error, {
-      type: 'error',
-      toastId: 'Interviews-Toast',
-    });
-  }
+    function renderContent() {
+      return (
+        <div className="ui container">
+          <h2>Interviews</h2>
+          <InterviewCreate />
+          <RenderInterviewStudentsTable onDeleteInterview={deleteInterview} onDeleteSession={deleteSession} />
+        </div>
+      );
+    }
 
-  return (
-    <React.Fragment>
-      {isLoading && <LoadingSpinner />}
-      {error && error !== 'canceled' && (
-        <ErrorModal onCloseModal={clearErrorHandler} header={'Error'} content={error} />
-      )}
-    </React.Fragment>
-  );
+    function deleteInterview(interviewId?: number) {
+      if (!interviewId) return;
+
+      (async () => {
+        try {
+          const response = await sendRequest({
+            successMessage: 'Student successfully deleted!',
+            url: `/interview/${interviewId}`,
+            method: 'DELETE',
+            headers: {Authorization: `Bearer ${authState.jwt}`},
+          });
+          console.log('API_DELETING_INTERVIEW', response);
+          interviewsDispatcher(ACTION_TYPES.INTERVIEWS.DELETE_INTERVIEW, response.data);
+        } catch (e: any) {
+          // Don't reset Students Redux state.
+        }
+      })();
+    }
+
+    function deleteSession(studentId: number, interviewId: number) {
+      if (!studentId || !interviewId) {
+        console.error(`studentId ${studentId} or interviewId ${interviewId} is null`);
+      }
+
+      (async () => {
+        try {
+          const response = await sendRequest({
+            successMessage: 'Student Interview session successfully deleted!',
+            url: `/session`,
+            method: 'DELETE',
+            body: {
+              studentId,
+              interviewId,
+            },
+            headers: {'Content-Type': 'application/json', Authorization: `Bearer ${authState.jwt}`},
+          });
+          console.log('API_DELETING_STUDENT_INTERVIEW', response);
+          interviewsDispatcher(ACTION_TYPES.SESSION.DELETE_SESSION, [
+            {student_id: studentId, interview_id: interviewId},
+          ]);
+        } catch (e: any) {
+          // Don't reset Students Redux state.
+        }
+      })();
+    }
+
+    if (error && error !== 'canceled') {
+      toast(error, {
+        type: 'error',
+        toastId: 'Interviews-Toast',
+      });
+    }
+
+    return (
+      <React.Fragment>
+        {isLoading && <LoadingSpinner />}
+        {error && error !== 'canceled' && (
+          <ErrorModal onCloseModal={clearErrorHandler} header={'Error'} content={error} />
+        )}
+        {renderContent()}
+      </React.Fragment>
+    );
 }
 
 export default Interviews;

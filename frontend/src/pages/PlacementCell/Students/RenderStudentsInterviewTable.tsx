@@ -52,7 +52,10 @@ function RenderStudentsInterviewTable(props: any) {
                         Delete Student
                       </button>
                       <br />
-                      <Link to={`/session/create/${student.student_id}`} className="ui positive primary button">
+                      <Link
+                        to={`/session/create-student-session/${student.student_id}`}
+                        className="ui positive primary button"
+                      >
                         <i className="calendar plus outline icon"></i>
                         Add Session
                       </Link>

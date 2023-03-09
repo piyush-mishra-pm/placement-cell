@@ -15,11 +15,12 @@ import OAuthFailure from './pages/oAuth/OAuthFailure';
 import Footer from './components/Footer';
 import Students from './pages/PlacementCell/Students/Students';
 import Interviews from './pages/PlacementCell/Interviews/Interviews';
-
-import './App.css';
 import Reports from './pages/PlacementCell/Reports';
 import EditSession from './pages/PlacementCell/Sessions/EditSession';
-import CreateSession from './pages/PlacementCell/Sessions/CreateSession';
+import CreateStudentSession from './pages/PlacementCell/Sessions/CreateSession';
+import CreateInterviewSession from './pages/PlacementCell/Sessions/CreateInterviewSession';
+
+import './App.css';
 
 function App() {
   return (
@@ -37,7 +38,8 @@ function App() {
           <Route path="/students" exact component={Students} />
           <Route path="/interviews" exact component={Interviews} />
           <Route path="/session/edit/:studentId/:interviewId" exact component={EditSession} />
-          <Route path="/session/create/:studentId" exact component={CreateSession} />
+          <Route path="/session/create-student-session/:studentId" exact component={CreateStudentSession} />
+          <Route path="/session/create-interview-session/:interviewId" exact component={CreateInterviewSession} />
           <Route path="/reports" exact component={Reports} />
           <Route path="/" exact component={Home} />
           <Route path="*" component={NotFound} />

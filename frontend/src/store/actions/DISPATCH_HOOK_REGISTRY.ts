@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
-import { AUTH_PAYLOAD, USER_PAYLOAD, STUDENT_PAYLOAD, INTERVIEW_PAYLOAD } from '../PAYLOAD_DEFINITIONS';
+import { AUTH_PAYLOAD, USER_PAYLOAD, STUDENT_PAYLOAD, INTERVIEW_STUDENT_PAYLOAD } from '../PAYLOAD_DEFINITIONS';
 
 export const useAuthDispatcher = () => {
     const dispatch = useDispatch();
@@ -25,7 +25,7 @@ export const useStudentsDispatcher = () => {
 
 export const useInterviewsDispatcher = () => {
     const dispatch = useDispatch();
-    return useCallback((type: string, payload: INTERVIEW_PAYLOAD[] | undefined) => {
+    return useCallback((type: string, payload: INTERVIEW_STUDENT_PAYLOAD[] | undefined) => {
         dispatch({ type, payload })
     }, [dispatch]);
 }
