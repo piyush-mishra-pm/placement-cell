@@ -32,3 +32,12 @@ export interface INTERVIEW_PAYLOAD {
     description?: string;
     time?: number;
 }
+
+export interface INTERVIEW_STUDENT_PAYLOAD extends STUDENT_PII_PAYLOAD {
+    interview_id?: number;
+    company_name?: string;
+    interview_name?: string;
+    description?: string;
+    time?: number;
+    interview_status?: string;
+}

@@ -70,9 +70,7 @@ function Students() {
           headers: {'Content-Type': 'application/json', Authorization: `Bearer ${authState.jwt}`},
         });
         console.log('API_DELETING_STUDENT_INTERVIEW', response);
-        studentsDispatcher(ACTION_TYPES.STUDENTS.DELETE_STUDENT_INTERVIEW, [
-          {student_id: studentId, interview_id: interviewId},
-        ]);
+        studentsDispatcher(ACTION_TYPES.SESSION.DELETE_SESSION, [{student_id: studentId, interview_id: interviewId}]);
       } catch (e: any) {
         // Don't reset Students Redux state.
       }

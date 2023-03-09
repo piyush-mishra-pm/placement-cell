@@ -11,7 +11,21 @@ export async function getAllInterviews(req: Request, res: Response, next: NextFu
 
     try {
         const results = await pgDb.query(
-            'SELECT * FROM interviews LIMIT $1 OFFSET $2',
+            `SELECT
+                interview_id,
+                company_name,
+                interview_name,
+                description,
+                time,
+                interview_status,
+                student_id,
+                first_name, last_name,
+                batch
+            FROM interviews AS int
+            LEFT JOIN sessions ss USING(interview_id)
+            LEFT JOIN students st USING (student_id)
+            ORDER BY ss.interview_id
+            LIMIT $1 OFFSET $2`,
             [itemsPerPage, (page - 1) * itemsPerPage]);
         if (results.rows.length === 0) {
             return next(new ErrorObject(400, 'No Interviews results!'));
