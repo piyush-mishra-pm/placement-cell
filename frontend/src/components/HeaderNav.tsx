@@ -53,6 +53,13 @@ function HeaderNav() {
               </Link>
             </div>
           )}
+          {loggedInUser && (
+            <div className="item">
+              <Link className="ui positive button" to="/external-jobs">
+                External Jobs
+              </Link>
+            </div>
+          )}
           {!loggedInUser && (
             <div className="item">
               <Link className="ui positive button" to="/register">

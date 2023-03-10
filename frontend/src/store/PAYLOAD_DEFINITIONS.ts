@@ -41,3 +41,23 @@ export interface INTERVIEW_STUDENT_PAYLOAD extends STUDENT_PII_PAYLOAD {
     time?: number;
     interview_status?: string;
 }
+
+export interface EXTERNAL_JOB_PAYLOAD_ITEM {
+    redirect_url?: string,
+    description?: string,
+    title?: string,
+    company?: displayName,
+    location?: displayName,
+    created?: string,
+    contract_time?: string,
+    contract_type?: string,
+}
+
+interface displayName {
+    display_name: string,
+}
+
+export interface EXTERNAL_JOB_PAYLOAD_OBJECT {
+    results?: Array<EXTERNAL_JOB_PAYLOAD_ITEM>,
+    count?: number,
+}

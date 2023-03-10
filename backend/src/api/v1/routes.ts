@@ -5,6 +5,7 @@ import { forgot, reset } from '../../controllers/forgotController';
 import { studentIdExistInDB, getAllStudents, getStudent, createStudent, updateStudent, deleteStudent } from '../../controllers/studentController';
 import { interviewIdExistInDB, getAllInterviews, getInterview, createInterview, updateInterview, deleteInterview } from '../../controllers/InterviewController';
 import { sessionExists, createSession, getSession, getSessionsOfStudent, getSessionsAvailabaleForStudentToTake, getStudentsAvailableForInterviewSession, getSessionsOfInterview, updateSessionStatus, deleteSession } from '../../controllers/sessionsController';
+import { getAdzunaJobs } from "../../controllers/adzuna";
 import { REDIS_QUERY_TYPE, useCacheIfStored } from "../../db/redisHelper";
 
 import checkRecaptcha from '../../middlewares/checkRecaptcha';
@@ -12,6 +13,7 @@ import checkRecaptcha from '../../middlewares/checkRecaptcha';
 import { validationFactory } from "../../middlewares/validateInputs";
 import { registerValidation, loginValidation, forgotValidation, resetValidation } from "../../models/validationModels";
 import checkAuth from "../../middlewares/checkAuth";
+
 
 export function configureRouter(router: Router) {
     // Auth Routes:
@@ -84,4 +86,7 @@ export function configureRouter(router: Router) {
         interviewIdExistInDB,
         sessionExists(true),
         deleteSession);
+
+    // External Jobs APIs: Adzuna:
+    router.get('/api/v1/adzuna/itjobs/:page/:itemsPerPage', useCacheIfStored(REDIS_QUERY_TYPE.GET_ADZUNA_JOBS_LIMIT_OFFSET), getAdzunaJobs);
 }

@@ -21,6 +21,7 @@ import CreateStudentSession from './pages/PlacementCell/Sessions/CreateStudentSe
 import CreateInterviewSession from './pages/PlacementCell/Sessions/CreateInterviewSession';
 
 import './App.css';
+import Adzuna from './pages/PlacementCell/Adzuna/Adzuna';
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
           <Route path="/session/create-student-session/:studentId" exact component={CreateStudentSession} />
           <Route path="/session/create-interview-session/:interviewId" exact component={CreateInterviewSession} />
           <Route path="/reports" exact component={Reports} />
+          <Route path="/external-jobs/:page?" exact component={Adzuna} />
           <Route path="/" exact component={Home} />
           <Route path="*" component={NotFound} />
         </Switch>

@@ -45,6 +45,9 @@ export function getRedisKey(queryType: REDIS_QUERY_TYPE, req: Request): string {
     else if (queryType === REDIS_QUERY_TYPE.STUDENTS_AVAILABLE_TO_TAKE_INTERVIEW) {
         return `SS_AV_INT_${interviewId}_${page}_${itemsPerPage}`;
     }
+    else if (queryType === REDIS_QUERY_TYPE.GET_ADZUNA_JOBS_LIMIT_OFFSET) {
+        return `ADZ_GET_${page}_${itemsPerPage}`;
+    }
     else {
         throw new Error("Key not defined for redis.");
     }
@@ -65,6 +68,8 @@ export enum REDIS_QUERY_TYPE {
     SESSIONS_OF_STUDENT_ID = 'SESSIONS_OF_STUDENT_ID',
     SESSIONS_AVAILABLE_FOR_STUDENT_TO_TAKE = 'SESSIONS_AVAILABLE_FOR_STUDENT_TO_TAKE',
     STUDENTS_AVAILABLE_TO_TAKE_INTERVIEW = 'STUDENTS_AVAILABLE_TO_TAKE_INTERVIEW',
+
+    GET_ADZUNA_JOBS_LIMIT_OFFSET = 'GET_ADZUNA_JOBS_LIMIT_OFFSET'
 }
 
 export function useCacheIfStored(queryType: REDIS_QUERY_TYPE, successMessage: string = 'Successfully retrieved from Cache!') {
