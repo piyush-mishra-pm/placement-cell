@@ -59,7 +59,7 @@ export async function createInterview(req: Request, res: Response, next: NextFun
     const { company_name, interview_name, description, time } = req.body;
 
     try {
-        const results = await pgDb.query('INSERT INTO interviews(company_name, interview_name, description, time) VALUES($1, $2, $3, $4)', [company_name, interview_name, description, time]);
+        const results = await pgDb.query('INSERT INTO interviews(company_name, interview_name, description, time) VALUES($1, $2, $3, $4) RETURNING *', [company_name, interview_name, description, time]);
         return res.status(200).send({ success: 'true', message: 'Created Interview successfully', data: results.rows });
     } catch (e) {
         console.log('Create Interview failed: ', e);
@@ -95,7 +95,7 @@ export async function deleteInterview(req: Request, res: Response, next: NextFun
             [interviewId]);
         // Step2: Delete Interview details:
         const results = await pgDb.query(
-            'DELETE FROM interviews WHERE interview_id=$1',
+            'DELETE FROM interviews WHERE interview_id=$1 RETURNING *',
             [interviewId]);
         // COMMIT Transaction:
         await client.query('COMMIT');
