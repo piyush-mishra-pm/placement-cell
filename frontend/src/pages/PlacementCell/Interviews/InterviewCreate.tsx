@@ -1,8 +1,7 @@
 import React from 'react';
-import {useForm} from 'react-hook-form';
+import {useForm, Controller} from 'react-hook-form';
 import {toast} from 'react-toastify';
 import {useSelector} from 'react-redux';
-
 import {useHttpClient} from '../../../hooks/httpHook';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 import ErrorModal from '../../../components/ErrorModal';
@@ -14,7 +13,7 @@ type CreateInterviewFormData = {
   company_name: string;
   interview_name: string;
   description: string;
-  time: number;
+  dateTimePicker: Date;
 };
 
 export default function InterviewCreate() {
@@ -31,7 +30,7 @@ export default function InterviewCreate() {
 
   const authState: AUTH_STATE = useSelector((state: STATE) => state.auth);
 
-  const onSubmit = handleSubmit(async ({company_name, interview_name, description, time}) => {
+  const onSubmit = handleSubmit(async ({company_name, interview_name, description, dateTimePicker}) => {
     try {
       const results = await sendRequest({
         successMessage: 'Created interview successfully!',
@@ -41,7 +40,7 @@ export default function InterviewCreate() {
           interview_name,
           company_name,
           description,
-          time,
+          time: new Date(dateTimePicker).getTime() / 1000,
         },
         headers: {Authorization: `Bearer ${authState.jwt}`},
       });
@@ -71,16 +70,9 @@ export default function InterviewCreate() {
           {errors.description && <div className="ui pointing red basic label">Please enter number for age.</div>}
         </div>
         <div className="field">
-          <input placeholder="1231312" {...register('time', {required: true, pattern: /\d+/})} />
-          {errors.time && <div className="ui pointing red basic label">Please enter number for age.</div>}
+          <input type="datetime-local" {...register('dateTimePicker', {valueAsDate: true, required: true})} />
+          {errors.dateTimePicker && <div className="ui pointing red basic label">Please enter interview time.</div>}
         </div>
-        {/* <Controller
-          control={control}
-          name="time"
-          render={({field: {onChange, onBlur, value, ref}}) => (
-            <DateTimePicker onChange={onChange} onBlur={onBlur} selected={value} />
-          )}
-        /> */}
         <input type="submit" />
       </form>
     );

@@ -162,7 +162,7 @@ function CreateSession() {
                 <td key={_.uniqueId()}>{currentSession.company_name}</td>
                 <td key={_.uniqueId()}>{currentSession.interview_name}</td>
                 <td key={_.uniqueId()}>{currentSession.description}</td>
-                <td key={_.uniqueId()}>{currentSession.time}</td>
+                <td key={_.uniqueId()}>{currentSession.time && new Date(currentSession.time * 1000).toISOString()}</td>
                 <td key={_.uniqueId()}>
                   {currentSession.interview_status}
                   <hr />
@@ -218,7 +218,9 @@ function CreateSession() {
                         <td key={_.uniqueId()}>{availableSession.company_name}</td>
                         <td key={_.uniqueId()}>{availableSession.interview_name}</td>
                         <td key={_.uniqueId()}>{availableSession.description}</td>
-                        <td key={_.uniqueId()}>{availableSession.time}</td>
+                        <td key={_.uniqueId()}>
+                          {availableSession.time && new Date(availableSession.time * 1000).toISOString()}
+                        </td>
                       </tr>
                     ))}
                 </tbody>

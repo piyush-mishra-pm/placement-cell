@@ -63,7 +63,9 @@ function RenderInterviewStudentsTable(props: any) {
                     <td rowSpan={interview.studentData?.length}>{interview.interview_name}</td>
                     <td rowSpan={interview.studentData?.length}>{interview.company_name}</td>
                     <td rowSpan={interview.studentData?.length}>{interview.description}</td>
-                    <td rowSpan={interview.studentData?.length}>{interview.time}</td>
+                    <td rowSpan={interview.studentData?.length}>
+                      {interview.time && new Date(interview.time * 1000).toISOString()}
+                    </td>
                   </React.Fragment>
                 )}
                 <td key={_.uniqueId()}>

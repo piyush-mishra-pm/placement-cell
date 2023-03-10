@@ -91,7 +91,7 @@ function EditSession() {
               </p>
 
               <p>
-                Time : <b>{sessionData.time}</b>
+                Time : <b>{sessionData.time && new Date(sessionData.time * 1000).toISOString()}</b>
               </p>
               <p>
                 Description : <b>{sessionData.description}</b>

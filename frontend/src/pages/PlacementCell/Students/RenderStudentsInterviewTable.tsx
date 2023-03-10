@@ -84,7 +84,11 @@ function RenderStudentsInterviewTable(props: any) {
                 <td key={_.uniqueId()}>{!interview || !interview.company_name ? 'NA' : interview.company_name}</td>
                 <td key={_.uniqueId()}>{!interview || !interview.interview_name ? 'NA' : interview.interview_name}</td>
                 <td key={_.uniqueId()}>{!interview || !interview.description ? 'NA' : interview.description}</td>
-                <td key={_.uniqueId()}>{!interview || !interview.time ? 'NA' : interview.time}</td>
+                <td key={_.uniqueId()}>
+                  {!interview || !interview.time
+                    ? 'NA'
+                    : interview.time && new Date(interview.time * 1000).toISOString()}
+                </td>
                 <td key={_.uniqueId()}>
                   {!interview || !interview.interview_id ? 'NA' : interview.interview_status}
                   <br />
