@@ -22,6 +22,7 @@ export async function createSession(req: Request, res: Response, next: NextFunct
                     SELECT student_id, interview_id FROM sessions WHERE student_id = $1 and interview_id = $2
                 )`,
             [studentId, interviewId, interviewStatus]);
+        await redisDeleteKey(getRedisKey(REDIS_QUERY_TYPE.STUDENTS_AVAILABLE_TO_TAKE_INTERVIEW, req));
         return res.status(200).send({ success: 'true', message: 'Created Session successfully', data: results.rows });
     } catch (e) {
         console.log('Session Creation failed: ', e);
@@ -164,6 +165,37 @@ export async function getSessionsOfInterview(req: Request, res: Response, next: 
         }
         // Save in Cache:
         await redisSaveWithTtl(getRedisKey(REDIS_QUERY_TYPE.SESSIONS_OF_INTERVIEW_ID, req), results.rows, 10);
+        return res.status(200).send({ success: 'true', message: 'Fetched Sessions of interview successfully', data: results.rows });
+    } catch (e) {
+        console.log('Fetching Sessions of interview failed: ', e);
+        next(new ErrorObject(500, `Something went wrong in getSessionsOfInterview!${e}`));
+    }
+}
+
+export async function getStudentsAvailableForInterviewSession(req: Request, res: Response, next: NextFunction) {
+    const interviewId = req.params.interviewId || req.query.interviewId || req.body.interviewId;
+    const page = parseInt(req.params.page);
+    const itemsPerPage = parseInt(req.params.itemsPerPage);
+
+    try {
+        if (!interviewId || !page || !itemsPerPage || isNaN(page) || isNaN(itemsPerPage)) {
+            throw new Error("interviewId, page or itemsPerPage is undefined/null. Cant get sessions of interview.");
+        }
+
+        const results = await pgDb.query(
+            `SELECT *
+            FROM students
+            WHERE student_id
+                NOT IN (SELECT DISTINCT student_id
+                        FROM sessions
+                        WHERE interview_id=$1)
+            LIMIT $2 OFFSET $3`,
+            [interviewId, itemsPerPage, (page - 1) * itemsPerPage]);
+        if (results.rows.length === 0) {
+            return next(new ErrorObject(400, 'No such interview sessions of the Interview.'));
+        }
+        // Save in Cache:
+        await redisSaveWithTtl(getRedisKey(REDIS_QUERY_TYPE.STUDENTS_AVAILABLE_TO_TAKE_INTERVIEW, req), results.rows, 10);
         return res.status(200).send({ success: 'true', message: 'Fetched Sessions of interview successfully', data: results.rows });
     } catch (e) {
         console.log('Fetching Sessions of interview failed: ', e);

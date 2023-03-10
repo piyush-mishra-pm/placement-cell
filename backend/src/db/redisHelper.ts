@@ -38,8 +38,12 @@ export function getRedisKey(queryType: REDIS_QUERY_TYPE, req: Request): string {
     }
     else if (queryType === REDIS_QUERY_TYPE.SESSION_GET) {
         return `SS_${studentId}_${interviewId}`;
-    } else if (queryType === REDIS_QUERY_TYPE.SESSIONS_AVAILABLE_FOR_STUDENT_TO_TAKE) {
+    }
+    else if (queryType === REDIS_QUERY_TYPE.SESSIONS_AVAILABLE_FOR_STUDENT_TO_TAKE) {
         return `SS_AV_ST_${studentId}_${page}_${itemsPerPage}`;
+    }
+    else if (queryType === REDIS_QUERY_TYPE.STUDENTS_AVAILABLE_TO_TAKE_INTERVIEW) {
+        return `SS_AV_INT_${interviewId}_${page}_${itemsPerPage}`;
     }
     else {
         throw new Error("Key not defined for redis.");
@@ -60,6 +64,7 @@ export enum REDIS_QUERY_TYPE {
     SESSIONS_OF_INTERVIEW_ID = 'SESSIONS_OF_INTERVIEW_ID',
     SESSIONS_OF_STUDENT_ID = 'SESSIONS_OF_STUDENT_ID',
     SESSIONS_AVAILABLE_FOR_STUDENT_TO_TAKE = 'SESSIONS_AVAILABLE_FOR_STUDENT_TO_TAKE',
+    STUDENTS_AVAILABLE_TO_TAKE_INTERVIEW = 'STUDENTS_AVAILABLE_TO_TAKE_INTERVIEW',
 }
 
 export function useCacheIfStored(queryType: REDIS_QUERY_TYPE, successMessage: string = 'Successfully retrieved from Cache!') {

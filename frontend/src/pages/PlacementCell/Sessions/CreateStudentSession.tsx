@@ -10,7 +10,7 @@ import ErrorModal from '../../../components/ErrorModal';
 import {AUTH_STATE, STATE, INTERVIEW_STATUS} from '../../../store/STATE_DEFINITIONS';
 import {INTERVIEW_PAYLOAD, STUDENT_PAYLOAD} from '../../../store/PAYLOAD_DEFINITIONS';
 
-function CreateSession() {
+function CreateStudentSession() {
   const {studentId} = useParams<{
     studentId: string;
   }>();
@@ -112,72 +112,79 @@ function CreateSession() {
   function renderCurrentlyScheduledSessions() {
     return (
       <React.Fragment>
-        <div className="ui card center aligned">
-          <div className="content">
-            <div className="header">Student Details</div>
-            {currentSessionsData[0] && (
-              <div className="description">
-                <p className="meta">
-                  ID: <b>{currentSessionsData[0] && currentSessionsData[0].student_id}</b>
-                </p>
-                <p>
-                  First Name : <b> {currentSessionsData[0] && currentSessionsData[0].first_name} </b>
-                </p>
-                <p>
-                  Last Name : <b>{currentSessionsData[0].last_name}</b>
-                </p>
-                <p>
-                  Batch : <b>{currentSessionsData[0].batch}</b>
-                </p>
-              </div>
-            )}
+        <div className="ui container">
+          <div className="ui centered card">
+            <div className="content">
+              <div className="header">Student Details</div>
+              {currentSessionsData[0] && (
+                <div className="description">
+                  <p className="meta">
+                    ID: <b>{currentSessionsData[0] && currentSessionsData[0].student_id}</b>
+                  </p>
+                  <p>
+                    First Name : <b> {currentSessionsData[0] && currentSessionsData[0].first_name} </b>
+                  </p>
+                  <p>
+                    Last Name : <b>{currentSessionsData[0].last_name}</b>
+                  </p>
+                  <p>
+                    Batch : <b>{currentSessionsData[0].batch}</b>
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
-
-        <table className="ui celled structured striped table">
-          <thead className="center aligned">
-            <tr>
-              <th>Actions</th>
-              <th>interview_id</th>
-              <th>company_name</th>
-              <th>interview_name</th>
-              <th>description</th>
-              <th>time</th>
-              <th>interview_status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentSessionsData.map((currentSession) => (
-              <tr key={_.uniqueId()}>
-                <td>
-                  <button
-                    className="ui negative primary button"
-                    onClick={() => onDeleteStudentInterview(currentSession.student_id, currentSession.interview_id)}
-                  >
-                    <i className="calendar minus outline icon"></i>
-                    Delete Session
-                  </button>
-                </td>
-                <td key={_.uniqueId()}>{currentSession.interview_id}</td>
-                <td key={_.uniqueId()}>{currentSession.company_name}</td>
-                <td key={_.uniqueId()}>{currentSession.interview_name}</td>
-                <td key={_.uniqueId()}>{currentSession.description}</td>
-                <td key={_.uniqueId()}>{currentSession.time && new Date(currentSession.time * 1000).toISOString()}</td>
-                <td key={_.uniqueId()}>
-                  {currentSession.interview_status}
-                  <hr />
-                  <Link
-                    to={`/session/edit/${currentSession.student_id}/${currentSession.interview_id}`}
-                    className="ui secondary button"
-                  >
-                    <i className="edit alternate outline icon"></i>
-                    Edit Status
-                  </Link>
-                </td>
+        <div className="ui divider"></div>
+        <div className="ui container">
+          <h3 className="ui header centerd">Already registered interviews</h3>
+          <table className="ui celled structured striped table">
+            <thead className="center aligned">
+              <tr>
+                <th>Actions</th>
+                <th>interview_id</th>
+                <th>company_name</th>
+                <th>interview_name</th>
+                <th>description</th>
+                <th>time</th>
+                <th>interview_status</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {currentSessionsData.map((currentSession) => (
+                <tr key={_.uniqueId()}>
+                  <td>
+                    <button
+                      className="ui negative primary button"
+                      onClick={() => onDeleteStudentInterview(currentSession.student_id, currentSession.interview_id)}
+                    >
+                      <i className="calendar minus outline icon"></i>
+                      Delete Session
+                    </button>
+                  </td>
+                  <td key={_.uniqueId()}>{currentSession.interview_id}</td>
+                  <td key={_.uniqueId()}>{currentSession.company_name}</td>
+                  <td key={_.uniqueId()}>{currentSession.interview_name}</td>
+                  <td key={_.uniqueId()}>{currentSession.description}</td>
+                  <td key={_.uniqueId()}>
+                    {currentSession.time && new Date(currentSession.time * 1000).toISOString()}
+                  </td>
+                  <td key={_.uniqueId()}>
+                    {currentSession.interview_status}
+                    <Link
+                      to={`/session/edit/${currentSession.student_id}/${currentSession.interview_id}`}
+                      className="ui secondary right floated button"
+                    >
+                      <i className="edit alternate outline icon"></i>
+                      Edit Status
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="ui divider"></div>
       </React.Fragment>
     );
   }
@@ -185,9 +192,9 @@ function CreateSession() {
   function renderAvailableSessionsInfo() {
     return (
       <React.Fragment>
-        <div className="ui card center aligned">
+        <div className="ui container">
           <div className="content">
-            <div className="header">Interviews available to add to Student.</div>
+            <div className="header">More interviews available for Student.</div>
             <div className="description">
               <table className="ui celled structured striped table">
                 <thead className="center aligned">
@@ -198,7 +205,6 @@ function CreateSession() {
                     <th>interview_name</th>
                     <th>description</th>
                     <th>time</th>
-                    <th>interview_status</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -207,7 +213,7 @@ function CreateSession() {
                       <tr key={_.uniqueId()}>
                         <td>
                           <button
-                            className="ui negative primary button"
+                            className="ui positive primary button"
                             onClick={() => onAddStudentInterview(parseInt(studentId), availableSession.interview_id)}
                           >
                             <i className="calendar plus outline icon"></i>
@@ -253,4 +259,4 @@ function CreateSession() {
   );
 }
 
-export default CreateSession;
+export default CreateStudentSession;

@@ -17,7 +17,7 @@ import Students from './pages/PlacementCell/Students/Students';
 import Interviews from './pages/PlacementCell/Interviews/Interviews';
 import Reports from './pages/PlacementCell/Reports';
 import EditSession from './pages/PlacementCell/Sessions/EditSession';
-import CreateStudentSession from './pages/PlacementCell/Sessions/CreateSession';
+import CreateStudentSession from './pages/PlacementCell/Sessions/CreateStudentSession';
 import CreateInterviewSession from './pages/PlacementCell/Sessions/CreateInterviewSession';
 
 import './App.css';

@@ -1,5 +1,5 @@
 import React from 'react';
-import {useForm, Controller} from 'react-hook-form';
+import {useForm} from 'react-hook-form';
 import {toast} from 'react-toastify';
 import {useSelector} from 'react-redux';
 import {useHttpClient} from '../../../hooks/httpHook';
@@ -21,7 +21,6 @@ export default function InterviewCreate() {
     register,
     handleSubmit,
     formState: {errors},
-    control,
   } = useForm<CreateInterviewFormData>();
 
   const {isLoading, error, sendRequest, clearErrorHandler} = useHttpClient();
@@ -67,7 +66,9 @@ export default function InterviewCreate() {
         </div>
         <div className="field">
           <input placeholder="description" {...register('description', {required: true})} />
-          {errors.description && <div className="ui pointing red basic label">Please enter number for age.</div>}
+          {errors.description && (
+            <div className="ui pointing red basic label">Please enter a description of interview.</div>
+          )}
         </div>
         <div className="field">
           <input type="datetime-local" {...register('dateTimePicker', {valueAsDate: true, required: true})} />
