@@ -9,10 +9,13 @@ import LoadingSpinner from '../../../components/LoadingSpinner';
 import ErrorModal from '../../../components/ErrorModal';
 import {AUTH_STATE, STATE, INTERVIEW_STATUS} from '../../../store/STATE_DEFINITIONS';
 import {INTERVIEW_STUDENT_PAYLOAD, STUDENT_PII_PAYLOAD} from '../../../store/PAYLOAD_DEFINITIONS';
+import Pagination from '../../../components/Pagination';
 
 function CreateInterviewSession() {
-  const {interviewId} = useParams<{
+  const {interviewId, scheduledPage, availablePage} = useParams<{
     interviewId: string;
+    scheduledPage: string;
+    availablePage: string;
   }>();
 
   const {isLoading, error, sendRequest, clearErrorHandler} = useHttpClient();
@@ -20,6 +23,14 @@ function CreateInterviewSession() {
 
   const [currentStudentsData, setCurrentStudentsData] = useState<Array<INTERVIEW_STUDENT_PAYLOAD>>([]);
   const [availableStudentsData, setAvailableStudentsData] = useState<Array<STUDENT_PII_PAYLOAD>>([]);
+
+  const [currentScheduledPage, setCurrentScheduledPage] = useState(parseInt(scheduledPage || '1'));
+  const [totalScheduledPages, setTotalScheduledPages] = useState(1);
+  const [currentAvailablePage, setCurrentAvailablePage] = useState(parseInt(availablePage || '1'));
+  const [totalAvailablePages, setTotalAvailablePages] = useState(1);
+
+  const NUMBER_OF_RESULTS_PER_PAGE = 2;
+
   const history = useHistory();
 
   useEffect(() => {
@@ -28,12 +39,13 @@ function CreateInterviewSession() {
       try {
         const response = await sendRequest({
           successMessage: 'Session successfully fetched!',
-          url: `/sessions/interview/${interviewId}/1/5`,
+          url: `/sessions/interview/${interviewId}/${currentScheduledPage}/${NUMBER_OF_RESULTS_PER_PAGE}`,
           method: 'GET',
           headers: {'Content-Type': 'application/json', Authorization: `Bearer ${authState.jwt}`},
         });
         console.log('API_GETTING_STUDENT_SESSIONS', response);
         setCurrentStudentsData(response.data);
+        setTotalScheduledPages(response.meta.numPages);
       } catch (e: any) {
         // Don't reset Students Redux state.
       }
@@ -44,17 +56,18 @@ function CreateInterviewSession() {
       try {
         const response = await sendRequest({
           successMessage: 'Session successfully fetched!',
-          url: `sessions/interview/available/${interviewId}/1/5`,
+          url: `sessions/interview/available/${interviewId}/${currentAvailablePage}/${NUMBER_OF_RESULTS_PER_PAGE}`,
           method: 'GET',
           headers: {'Content-Type': 'application/json', Authorization: `Bearer ${authState.jwt}`},
         });
         console.log('API_GETTING_STUDENT_AVAILABLE_FOR_INTERVIEW', response);
         setAvailableStudentsData(response.data);
+        setTotalAvailablePages(response.meta.numPages);
       } catch (e: any) {
         // Don't reset Students Redux state.
       }
     })();
-  }, [sendRequest, authState.jwt, interviewId]);
+  }, [sendRequest, authState.jwt, interviewId, currentScheduledPage, currentAvailablePage]);
 
   function onDeleteStudentInterview(studentId?: number, interviewId?: number): void {
     if (Number.isNaN(studentId) || Number.isNaN(interviewId)) {
@@ -140,8 +153,9 @@ function CreateInterviewSession() {
           </div>
         </div>
         <div className="ui divider"></div>
-        <div className="ui container">
+        <div className="ui center aligned container">
           <h3 className="ui header centered">Students Scheduled</h3>
+          <Pagination page={currentScheduledPage} pages={totalScheduledPages} changePage={setCurrentScheduledPage} />
           <table className="ui celled structured striped table">
             <thead className="center aligned">
               <tr>
@@ -195,39 +209,38 @@ function CreateInterviewSession() {
         <div className="ui center aligned container">
           <div className="content">
             <h3 className="ui header centered">Students available to add</h3>
-            <div className="description">
-              <table className="ui celled structured striped table">
-                <thead className="center aligned">
-                  <tr>
-                    <th>Actions</th>
-                    <th>student_id</th>
-                    <th>first_name</th>
-                    <th>last_name</th>
-                    <th>batch</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {availableStudentsData &&
-                    availableStudentsData.map((availableSession) => (
-                      <tr key={_.uniqueId()}>
-                        <td>
-                          <button
-                            className="ui positive primary button"
-                            onClick={() => onAddStudentInterview(availableSession.student_id, parseInt(interviewId))}
-                          >
-                            <i className="calendar plus outline icon"></i>
-                            Create Session
-                          </button>
-                        </td>
-                        <td key={_.uniqueId()}>{availableSession.student_id}</td>
-                        <td key={_.uniqueId()}>{availableSession.first_name}</td>
-                        <td key={_.uniqueId()}>{availableSession.last_name}</td>
-                        <td key={_.uniqueId()}>{availableSession.batch}</td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
-            </div>
+            <Pagination page={currentAvailablePage} pages={totalAvailablePages} changePage={setCurrentAvailablePage} />
+            <table className="ui celled structured striped table">
+              <thead className="center aligned">
+                <tr>
+                  <th>Actions</th>
+                  <th>student_id</th>
+                  <th>first_name</th>
+                  <th>last_name</th>
+                  <th>batch</th>
+                </tr>
+              </thead>
+              <tbody>
+                {availableStudentsData &&
+                  availableStudentsData.map((availableSession) => (
+                    <tr key={_.uniqueId()}>
+                      <td>
+                        <button
+                          className="ui positive primary button"
+                          onClick={() => onAddStudentInterview(availableSession.student_id, parseInt(interviewId))}
+                        >
+                          <i className="calendar plus outline icon"></i>
+                          Create Session
+                        </button>
+                      </td>
+                      <td key={_.uniqueId()}>{availableSession.student_id}</td>
+                      <td key={_.uniqueId()}>{availableSession.first_name}</td>
+                      <td key={_.uniqueId()}>{availableSession.last_name}</td>
+                      <td key={_.uniqueId()}>{availableSession.batch}</td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </React.Fragment>

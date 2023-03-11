@@ -89,6 +89,7 @@ export async function getSessionsOfStudent(req: Request, res: Response, next: Ne
             LEFT JOIN sessions ss ON ss.student_id = st.student_id 
             LEFT JOIN interviews int ON int.interview_id = ss.interview_id
             WHERE ss.student_id=$1
+            ORDER BY st.student_id,ss.interview_id
             LIMIT $2 OFFSET $3`,
             [studentId, itemsPerPage, (page - 1) * itemsPerPage]);
         if (results.rows.length === 0) {
@@ -103,7 +104,8 @@ export async function getSessionsOfStudent(req: Request, res: Response, next: Ne
             FROM students AS st 
             LEFT JOIN sessions ss ON ss.student_id = st.student_id 
             LEFT JOIN interviews int ON int.interview_id = ss.interview_id
-            WHERE ss.student_id=$1`, [studentId]);
+            WHERE ss.student_id=$1`,
+            [studentId]);
 
         return res.status(200).send({
             success: 'true',
@@ -132,13 +134,14 @@ export async function getSessionsAvailabaleForStudentToTake(req: Request, res: R
 
         const results = await pgDb.query(
             `SELECT * 
-            FROM interviews 
+            FROM interviews AS int
             WHERE interview_id 
                 NOT IN (
                     SELECT DISTINCT interview_id 
-                    FROM sessions 
+                    FROM sessions AS ss
                     WHERE student_id=$1
-                ) 
+                )
+            ORDER BY int.interview_id
             LIMIT $2 OFFSET $3;`,
             [studentId, itemsPerPage, (page - 1) * itemsPerPage]);
         if (results.rows.length === 0) {
@@ -202,6 +205,7 @@ export async function getSessionsOfInterview(req: Request, res: Response, next: 
             LEFT JOIN sessions ss ON int.interview_id = ss.interview_id
             LEFT JOIN students st ON ss.student_id = st.student_id 
             WHERE ss.interview_id=$1
+            ORDER BY int.interview_id, ss.student_id
             LIMIT $2 OFFSET $3`,
             [interviewId, itemsPerPage, (page - 1) * itemsPerPage]);
         if (results.rows.length === 0) {
@@ -247,11 +251,12 @@ export async function getStudentsAvailableForInterviewSession(req: Request, res:
 
         const results = await pgDb.query(
             `SELECT *
-            FROM students
+            FROM students AS st
             WHERE student_id
                 NOT IN (SELECT DISTINCT student_id
                         FROM sessions
                         WHERE interview_id=$1)
+            ORDER BY st.student_id
             LIMIT $2 OFFSET $3`,
             [interviewId, itemsPerPage, (page - 1) * itemsPerPage]);
         if (results.rows.length === 0) {
