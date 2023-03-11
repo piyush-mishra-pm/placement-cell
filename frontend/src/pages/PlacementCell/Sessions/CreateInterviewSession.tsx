@@ -29,7 +29,7 @@ function CreateInterviewSession() {
   const [currentAvailablePage, setCurrentAvailablePage] = useState(parseInt(availablePage || '1'));
   const [totalAvailablePages, setTotalAvailablePages] = useState(1);
 
-  const NUMBER_OF_RESULTS_PER_PAGE = 2;
+  const NUMBER_OF_RESULTS_PER_PAGE = 3;
 
   const history = useHistory();
 

@@ -27,7 +27,7 @@ export async function getAllStudents(req: Request, res: Response, next: NextFunc
 
         const results = await pgDb.query(
             `${QUERY_SELECT_ALL_STUDENTS}
-            ORDER BY st.student_id, ss.interview_id
+            ORDER BY st.student_id DESC, ss.interview_id DESC
             LIMIT $1 OFFSET $2`,
             [itemsPerPage, (page - 1) * itemsPerPage]);
 

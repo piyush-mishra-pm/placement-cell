@@ -8,6 +8,7 @@ import ErrorModal from '../../../components/ErrorModal';
 import {useInterviewsDispatcher} from '../../../store/actions/DISPATCH_HOOK_REGISTRY';
 import ACTION_TYPES from '../../../store/actions/ACTION_TYPES';
 import {AUTH_STATE, STATE} from '../../../store/STATE_DEFINITIONS';
+import {useHistory} from 'react-router-dom';
 
 type CreateInterviewFormData = {
   company_name: string;
@@ -28,6 +29,7 @@ export default function InterviewCreate() {
   const interviewsDispatcher = useInterviewsDispatcher();
 
   const authState: AUTH_STATE = useSelector((state: STATE) => state.auth);
+  const history = useHistory();
 
   const onSubmit = handleSubmit(async ({company_name, interview_name, description, dateTimePicker}) => {
     try {
@@ -45,6 +47,7 @@ export default function InterviewCreate() {
       });
       console.log('API_CREATE_INTERVIEW_RESULTS', results);
       interviewsDispatcher(ACTION_TYPES.INTERVIEWS.CREATE_INTERVIEW, results.data);
+      history.go(0);
     } catch (e: any) {
       console.error('error in student creation');
     }

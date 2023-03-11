@@ -26,7 +26,7 @@ function Students() {
       try {
         const response = await sendRequest({
           successMessage: 'Studenst successfully fetched!',
-          url: `/students/${currentPage}/3`,
+          url: `/students/${currentPage}/5`,
           method: 'GET',
           headers: {Authorization: `Bearer ${authState.jwt}`},
         });

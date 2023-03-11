@@ -27,7 +27,7 @@ export async function getAllInterviews(req: Request, res: Response, next: NextFu
     try {
         const results = await pgDb.query(
             `${QUERY_GET_ALL_INTERVIEWS}
-            ORDER BY int.interview_id,ss.student_id
+            ORDER BY int.interview_id DESC,ss.student_id DESC
             LIMIT $1 OFFSET $2`,
             [itemsPerPage, (page - 1) * itemsPerPage]);
         if (results.rows.length === 0) {

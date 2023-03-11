@@ -27,7 +27,7 @@ function Interviews() {
       try {
         const response = await sendRequest({
           successMessage: 'Interviews successfully fetched!',
-          url: `/interviews/${currentPage}/3`,
+          url: `/interviews/${currentPage}/5`,
           method: 'GET',
           headers: {Authorization: `Bearer ${authState.jwt}`},
         });
@@ -42,7 +42,7 @@ function Interviews() {
 
   function renderContent() {
     return (
-      <div className="ui container">
+      <div className="ui center aligned container">
         <h2>Interviews</h2>
         <InterviewCreate />
         <div className="ui divider"></div>

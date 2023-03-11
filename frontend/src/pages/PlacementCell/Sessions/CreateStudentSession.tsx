@@ -148,7 +148,7 @@ function CreateStudentSession() {
           </div>
         </div>
         <div className="ui divider"></div>
-        <div className="ui container">
+        <div className="ui center aligned container">
           <h3 className="ui header centered">Already registered interviews</h3>
           {currentSessionsData[0] && currentSessionsData[0] && currentSessionsData[0].student_id ? (
             renderTableAlreadyRegistered()
@@ -215,7 +215,7 @@ function CreateStudentSession() {
   function renderAvailableSessionsInfo() {
     return (
       <React.Fragment>
-        <div className="ui container">
+        <div className="ui center aligned container">
           <div className="content">
             <h3 className="ui header centered">More interviews available for Student.</h3>
             {availableSessionsData && availableSessionsData[0] && availableSessionsData[0].interview_id ? (

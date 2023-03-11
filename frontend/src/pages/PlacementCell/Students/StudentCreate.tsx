@@ -9,6 +9,7 @@ import ErrorModal from '../../../components/ErrorModal';
 import {useStudentsDispatcher} from '../../../store/actions/DISPATCH_HOOK_REGISTRY';
 import ACTION_TYPES from '../../../store/actions/ACTION_TYPES';
 import { AUTH_STATE, STATE } from '../../../store/STATE_DEFINITIONS';
+import {useHistory} from 'react-router-dom';
 
 type CreateStudentFormData = {
   first_name: string;
@@ -26,8 +27,9 @@ export default function StudentCreate() {
   const {isLoading, error, sendRequest, clearErrorHandler} = useHttpClient();
 
   const studentsDispatcher = useStudentsDispatcher();
-  
-  const authState: AUTH_STATE = useSelector((state:STATE)=>state.auth);
+
+  const authState: AUTH_STATE = useSelector((state: STATE) => state.auth);
+  const history = useHistory();
 
   const onSubmit = handleSubmit(async ({first_name, last_name, batch}) => {
     try {
@@ -44,6 +46,7 @@ export default function StudentCreate() {
       });
       console.log('API_CREATE_RESULTS', results);
       studentsDispatcher(ACTION_TYPES.STUDENTS.CREATE_STUDENT, results.data);
+      history.go(0);
     } catch (e: any) {
       console.error('error in student creation');
     }
