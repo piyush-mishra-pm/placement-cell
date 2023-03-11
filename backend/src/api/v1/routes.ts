@@ -6,13 +6,14 @@ import { studentIdExistInDB, getAllStudents, getStudent, createStudent, updateSt
 import { interviewIdExistInDB, getAllInterviews, getInterview, createInterview, updateInterview, deleteInterview } from '../../controllers/InterviewController';
 import { sessionExists, createSession, getSession, getSessionsOfStudent, getSessionsAvailabaleForStudentToTake, getStudentsAvailableForInterviewSession, getSessionsOfInterview, updateSessionStatus, deleteSession } from '../../controllers/sessionsController';
 import { getAdzunaJobs } from "../../controllers/adzuna";
-import { REDIS_QUERY_TYPE, useCacheIfStored } from "../../db/redisHelper";
+import { REDIS_QUERY_TYPE } from "../../db/redisHelper";
 
 import checkRecaptcha from '../../middlewares/checkRecaptcha';
 
 import { validationFactory } from "../../middlewares/validateInputs";
 import { registerValidation, loginValidation, forgotValidation, resetValidation } from "../../models/validationModels";
 import checkAuth from "../../middlewares/checkAuth";
+import { useCacheIfStored } from "../../middlewares/useCacheIfStored";
 
 
 export function configureRouter(router: Router) {

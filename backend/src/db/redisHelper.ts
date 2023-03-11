@@ -79,27 +79,3 @@ export enum REDIS_QUERY_TYPE {
 
     GET_ADZUNA_JOBS_LIMIT_OFFSET = 'GET_ADZUNA_JOBS_LIMIT_OFFSET'
 }
-
-export function useCacheIfStored(queryType: REDIS_QUERY_TYPE, successMessage: string = 'Successfully retrieved from Cache!') {
-    return async function cacheData(req: Request, res: Response, next: NextFunction) {
-        const cacheKey = getRedisKey(queryType, req);
-        try {
-            const cacheResults = await redisGet(cacheKey);
-            if (cacheResults) {
-                let results = JSON.parse(cacheResults);
-
-                res.send({
-                    message: successMessage,
-                    success: 'true',
-                    fromCache: true,
-                    data: results,
-                });
-            } else {
-                next();
-            }
-        } catch (e) {
-            console.log('Error in Cache get: ', e);
-            next(new ErrorObject(500, `Something went wrong in Cache!${e}`));
-        }
-    }
-}

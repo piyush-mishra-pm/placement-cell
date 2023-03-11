@@ -71,9 +71,10 @@ export async function getStudent(req: Request, res: Response, next: NextFunction
         if (results.rows.length === 0) {
             return next(new ErrorObject(400, `Student doesn't exist!`));
         }
+        const responseObject = { success: 'true', message: 'Successfully fetched Student details.', data: results.rows[0] };
         // Save in Cache:
-        await redisSaveWithTtl(getRedisKey(REDIS_QUERY_TYPE.STUDENT_GET, req), results.rows, 10);
-        return res.status(200).send({ success: 'true', message: 'Successfully fetched Student details.', data: results.rows[0] });
+        await redisSaveWithTtl(getRedisKey(REDIS_QUERY_TYPE.STUDENT_GET, req), responseObject, 10);
+        return res.status(200).send(responseObject);
     } catch (e) {
         console.log('getStudent failed: ', e);
         next(new ErrorObject(500, `Something went wrong in getStudent!${e}`));

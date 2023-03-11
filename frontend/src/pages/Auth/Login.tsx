@@ -5,7 +5,6 @@ import ReCAPTCHA from 'react-google-recaptcha';
 
 import ACTION_TYPES from '../../store/actions/ACTION_TYPES';
 import {useUserDispatcher, useAuthDispatcher} from '../../store/actions/DISPATCH_HOOK_REGISTRY';
-import OAuth from '../../components/OAuth';
 import {useHttpClient} from '../../hooks/httpHook';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import ErrorModal from '../../components/ErrorModal';
@@ -52,9 +51,7 @@ function Login() {
   function renderForm() {
     return (
       <div className="ui container" style={{width: '50%'}}>
-        <OAuth />
-        <hr />
-        <h2>... Or Login below</h2>
+        <h2>Login</h2>
         <form className="ui form" onSubmit={onSubmitHandler}>
           <div className="field required">
             <label>Email</label>

@@ -155,50 +155,62 @@ function CreateInterviewSession() {
         <div className="ui divider"></div>
         <div className="ui center aligned container">
           <h3 className="ui header centered">Students Scheduled</h3>
-          <Pagination page={currentScheduledPage} pages={totalScheduledPages} changePage={setCurrentScheduledPage} />
-          <table className="ui celled structured striped table">
-            <thead className="center aligned">
-              <tr>
-                <th>Actions</th>
-                <th>student_id</th>
-                <th>first_name</th>
-                <th>last_name</th>
-                <th>batch</th>
-                <th>interview_status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentStudentsData.map((currentSession) => (
-                <tr key={_.uniqueId()}>
-                  <td>
-                    <button
-                      className="ui negative primary button"
-                      onClick={() => onDeleteStudentInterview(currentSession.student_id, currentSession.interview_id)}
-                    >
-                      <i className="calendar minus outline icon"></i>
-                      Delete Session
-                    </button>
-                  </td>
-                  <td key={_.uniqueId()}>{currentSession.student_id}</td>
-                  <td key={_.uniqueId()}>{currentSession.first_name}</td>
-                  <td key={_.uniqueId()}>{currentSession.last_name}</td>
-                  <td key={_.uniqueId()}>{currentSession.batch}</td>
-                  <td key={_.uniqueId()}>
-                    {currentSession.interview_status}
-                    <Link
-                      to={`/session/edit/${currentSession.student_id}/${currentSession.interview_id}`}
-                      className="ui secondary right floated button"
-                    >
-                      <i className="edit alternate outline icon"></i>
-                      Edit Status
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          {currentStudentsData && currentStudentsData[0] && currentStudentsData[0].student_id ? (
+            renderCurrentlyScheduledTable()
+          ) : (
+            <div className="ui warning label">No currently registered students for the interview.</div>
+          )}
         </div>
         <div className="ui divider"></div>
+      </React.Fragment>
+    );
+  }
+
+  function renderCurrentlyScheduledTable() {
+    return (
+      <React.Fragment>
+        <Pagination page={currentScheduledPage} pages={totalScheduledPages} changePage={setCurrentScheduledPage} />
+        <table className="ui celled structured striped table">
+          <thead className="center aligned">
+            <tr>
+              <th>Actions</th>
+              <th>student_id</th>
+              <th>first_name</th>
+              <th>last_name</th>
+              <th>batch</th>
+              <th>interview_status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {currentStudentsData.map((currentSession) => (
+              <tr key={_.uniqueId()}>
+                <td>
+                  <button
+                    className="ui negative primary button"
+                    onClick={() => onDeleteStudentInterview(currentSession.student_id, currentSession.interview_id)}
+                  >
+                    <i className="calendar minus outline icon"></i>
+                    Delete Session
+                  </button>
+                </td>
+                <td key={_.uniqueId()}>{currentSession.student_id}</td>
+                <td key={_.uniqueId()}>{currentSession.first_name}</td>
+                <td key={_.uniqueId()}>{currentSession.last_name}</td>
+                <td key={_.uniqueId()}>{currentSession.batch}</td>
+                <td key={_.uniqueId()}>
+                  {currentSession.interview_status}
+                  <Link
+                    to={`/session/edit/${currentSession.student_id}/${currentSession.interview_id}`}
+                    className="ui secondary right floated button"
+                  >
+                    <i className="edit alternate outline icon"></i>
+                    Edit Status
+                  </Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </React.Fragment>
     );
   }
@@ -209,40 +221,52 @@ function CreateInterviewSession() {
         <div className="ui center aligned container">
           <div className="content">
             <h3 className="ui header centered">Students available to add</h3>
-            <Pagination page={currentAvailablePage} pages={totalAvailablePages} changePage={setCurrentAvailablePage} />
-            <table className="ui celled structured striped table">
-              <thead className="center aligned">
-                <tr>
-                  <th>Actions</th>
-                  <th>student_id</th>
-                  <th>first_name</th>
-                  <th>last_name</th>
-                  <th>batch</th>
-                </tr>
-              </thead>
-              <tbody>
-                {availableStudentsData &&
-                  availableStudentsData.map((availableSession) => (
-                    <tr key={_.uniqueId()}>
-                      <td>
-                        <button
-                          className="ui positive primary button"
-                          onClick={() => onAddStudentInterview(availableSession.student_id, parseInt(interviewId))}
-                        >
-                          <i className="calendar plus outline icon"></i>
-                          Create Session
-                        </button>
-                      </td>
-                      <td key={_.uniqueId()}>{availableSession.student_id}</td>
-                      <td key={_.uniqueId()}>{availableSession.first_name}</td>
-                      <td key={_.uniqueId()}>{availableSession.last_name}</td>
-                      <td key={_.uniqueId()}>{availableSession.batch}</td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
+            {availableStudentsData && availableStudentsData[0] && availableStudentsData[0].student_id ? (
+              renderAvailableStudentsTable()
+            ) : (
+              <div className="ui warning label">No more students available to add to the interview.</div>
+            )}
           </div>
         </div>
+      </React.Fragment>
+    );
+  }
+
+  function renderAvailableStudentsTable() {
+    return (
+      <React.Fragment>
+        <Pagination page={currentAvailablePage} pages={totalAvailablePages} changePage={setCurrentAvailablePage} />
+        <table className="ui celled structured striped table">
+          <thead className="center aligned">
+            <tr>
+              <th>Actions</th>
+              <th>student_id</th>
+              <th>first_name</th>
+              <th>last_name</th>
+              <th>batch</th>
+            </tr>
+          </thead>
+          <tbody>
+            {availableStudentsData &&
+              availableStudentsData.map((availableSession) => (
+                <tr key={_.uniqueId()}>
+                  <td>
+                    <button
+                      className="ui positive primary button"
+                      onClick={() => onAddStudentInterview(availableSession.student_id, parseInt(interviewId))}
+                    >
+                      <i className="calendar plus outline icon"></i>
+                      Create Session
+                    </button>
+                  </td>
+                  <td key={_.uniqueId()}>{availableSession.student_id}</td>
+                  <td key={_.uniqueId()}>{availableSession.first_name}</td>
+                  <td key={_.uniqueId()}>{availableSession.last_name}</td>
+                  <td key={_.uniqueId()}>{availableSession.batch}</td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
       </React.Fragment>
     );
   }

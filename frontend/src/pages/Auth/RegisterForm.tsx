@@ -3,7 +3,6 @@ import {Link, useHistory} from 'react-router-dom';
 import ReCAPTCHA from 'react-google-recaptcha';
 import {toast} from 'react-toastify';
 
-import OAuth from '../../components/OAuth';
 import {useHttpClient} from '../../hooks/httpHook';
 import ErrorModal from '../../components/ErrorModal';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -46,9 +45,7 @@ function RegisterForm() {
   function renderForm() {
     return (
       <div className="ui container" style={{width: '50%'}}>
-        <OAuth />
-        <hr />
-        <h2>... or register below</h2>
+        <h2>Register</h2>
         <form className="ui form" onSubmit={formSubmitHandler}>
           <div className="field required">
             <label>First Name</label>

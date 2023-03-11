@@ -10,8 +10,6 @@ import ResetPassword from './pages/Auth/ResetPassword';
 import ToastContainerWrapper from './components/ToastContainerWrapper';
 import NotFound from './pages/NotFound';
 import ResetPasswordMailSent from './pages/Auth/ResetPasswordMailSent';
-import OAuthSuccess from './pages/oAuth/OAuthSuccess';
-import OAuthFailure from './pages/oAuth/OAuthFailure';
 import Footer from './components/Footer';
 import Students from './pages/PlacementCell/Students/Students';
 import Interviews from './pages/PlacementCell/Interviews/Interviews';
@@ -34,8 +32,6 @@ function App() {
           <Route path="/reset/:token" exact component={ResetPassword} />
           <Route path="/reset_mail_sent" exact component={ResetPasswordMailSent} />
           <Route path="/login" exact component={Login} />
-          <Route path="/login-failure" exact component={OAuthFailure} />
-          <Route path="/login-success/:token" exact component={OAuthSuccess} />
           <Route path="/students/:page?" exact component={Students} />
           <Route path="/interviews/:page?" exact component={Interviews} />
           <Route path="/session/edit/:studentId/:interviewId" exact component={EditSession} />

@@ -125,15 +125,15 @@ npm start
 ---
 ## **Tasks**:
 - ✅ Auth service.
-- ❌ Redis Caching (Write Through Caching).
-- ❌ Students List Page:
-  - ❌ CRUD Student.
-- ❌ Interviews List Page:
-  - ❌ Create Interviews.
-  - ❌ Create Assign Students to interview.
-  - ❌ Mark Interview results.
-- ❌ External Jobs List. (Cache).
-- ❌ Download CSV dump:
+- ✅ Redis Caching (Write Through Caching).
+- ✅ Students List Page:
+  - ✅ CRUD Student.
+- ✅ Interviews List Page:
+  - ✅ Create Interviews.
+  - ✅ Create Assign Students to interview.
+  - ✅ Mark Interview results.
+- ✅ External Jobs List. (Cached).
+- ✅ Download CSV dump:
   - ❌ Allow configuring the data fields required.
   - ❌ Generate paginated preview and give stats of total results.
   - ❌ Allow downloading of final CSV.
@@ -144,5 +144,5 @@ npm start
 - ❌ Validation for path params, body.
 - ✅ Redis caching in Get (Student, Interviews and Sessions).
 - ❌ Redis caching in Auth.
-- ❌ Redis caching in create, update and delete as well. (Cache Invalidation issue.)
+- ✅ Redis caching in create, update and delete as well. (Cache Invalidation issue.)
 - ❌ Modal when fetching list of Students, Interviews, Jobs, etc.

@@ -5,10 +5,7 @@ import mongoose from 'mongoose';
 
 import { configureRouter } from './api/v1/routes';
 import ErrorObject from './utils/ErrorObject';
-import passport from 'passport';
 import * as UserModel from './models/UserModel';
-
-import oAuthRouter from './api/v1/oAuthRoutes';
 
 mongoose
   .connect(KEYS.MONGO_DB_URL || 'mongodb://localhost:27017/auth_node_react')
@@ -36,10 +33,6 @@ app.use((req, res, next) => {
   }
   next();
 });
-
-import './services/passport';
-app.use(passport.initialize());
-app.use('/api/v1', oAuthRouter);
 
 configureRouter(app);
 

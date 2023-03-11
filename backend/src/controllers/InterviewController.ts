@@ -33,7 +33,6 @@ export async function getAllInterviews(req: Request, res: Response, next: NextFu
         if (results.rows.length === 0) {
             return next(new ErrorObject(400, 'No Interviews results!'));
         }
-        await redisSaveWithTtl(getRedisKey(REDIS_QUERY_TYPE.INTERVIEWS_GET, req), results.rows, 10);
 
         // For Pagination: Cached exists for total student result count? (Expensive query so caching used).
         const cachedTotalInterviewCount = await redisGet(REDIS_QUERY_TYPE.INTERVIEWS_COUNT_GET);
@@ -43,9 +42,9 @@ export async function getAllInterviews(req: Request, res: Response, next: NextFu
 
         // For Pagination: Cached didnt exist, so query and store result in cache? (Expensive query so caching used).
         const countResults = await pgDb.query(QUERY_GET_ALL_INTERVIEWS);
-
         await redisSaveWithTtl(getRedisKey(REDIS_QUERY_TYPE.INTERVIEWS_COUNT_GET, req), countResults.rows.length, 60);// 1minute
-        return res.status(200).send({
+
+        const responseObject = {
             success: 'true',
             message: 'Fetched Interview records successfully',
             data: results.rows,
@@ -53,7 +52,11 @@ export async function getAllInterviews(req: Request, res: Response, next: NextFu
                 numPages: Math.ceil(countResults.rows.length / itemsPerPage),
                 count: countResults.rows.length
             }
-        });
+        };
+
+        // Save in Cache:
+        await redisSaveWithTtl(getRedisKey(REDIS_QUERY_TYPE.INTERVIEWS_GET, req), responseObject, 10);
+        return res.status(200).send(responseObject);
     } catch (e) {
         console.log('getAllInterviews failed: ', e);
         next(new ErrorObject(500, `Something went wrong in getAllInterviews!${e}`));
@@ -68,9 +71,10 @@ export async function getInterview(req: Request, res: Response, next: NextFuncti
         if (results.rows.length === 0) {
             return next(new ErrorObject(400, 'No such interview found'));
         }
+        const responseObject = { success: 'true', message: 'Successfully fetched Interview details.', data: results.rows[0] };
         // Save in Cache:
-        await redisSaveWithTtl(getRedisKey(REDIS_QUERY_TYPE.INTERVIEW_GET, req), results.rows, 10);
-        return res.status(200).send({ success: 'true', message: 'Successfully fetched Interview details.', data: results.rows[0] });
+        await redisSaveWithTtl(getRedisKey(REDIS_QUERY_TYPE.INTERVIEW_GET, req), responseObject, 10);
+        return res.status(200).send(responseObject);
     } catch (e) {
         console.log('getInterview failed: ', e);
         next(new ErrorObject(500, `Something went wrong in getInterview!${e}`));

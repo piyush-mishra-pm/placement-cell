@@ -52,15 +52,15 @@ export default function StudentCreate() {
   function renderForm() {
     return (
       <form onSubmit={onSubmit} className="ui form">
-        <div className="field">
+        <div className="field required">
           <input placeholder="first name" {...register('first_name', {required: true})} />
           {errors.first_name && <div className="ui pointing red basic label">First name is required.</div>}
         </div>
-        <div className="field">
+        <div className="field required">
           <input placeholder="last name" {...register('last_name', {required: true})} />
           {errors.last_name && <div className="ui pointing red basic label">Last name is required.</div>}
         </div>
-        <div className="field">
+        <div className="field required">
           <input placeholder="batch" {...register('batch', {required: true, pattern: /\d+/})} />
           {errors.batch && <div className="ui pointing red basic label">Please enter number for age.</div>}
         </div>

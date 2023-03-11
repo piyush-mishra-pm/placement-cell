@@ -20,9 +20,9 @@ export async function getAdzunaJobs(req: Request, res: Response, next: NextFunct
         if (adzunaResults.data.count === 0) {
             return next(new ErrorObject(400, 'No available jobs on Adzuna.'));
         }
-
-        await redisSaveWithTtl(getRedisKey(REDIS_QUERY_TYPE.GET_ADZUNA_JOBS_LIMIT_OFFSET, req), adzunaResults.data, 60 * 60); // 1hr TTL
-        return res.status(200).send({ success: 'true', message: 'Fetched adzuna jobs successfully', data: adzunaResults.data });
+        const responseObject = { success: 'true', message: 'Fetched adzuna jobs successfully', data: adzunaResults.data };
+        await redisSaveWithTtl(getRedisKey(REDIS_QUERY_TYPE.GET_ADZUNA_JOBS_LIMIT_OFFSET, req), responseObject, 60 * 60); // 1hr TTL
+        return res.status(200).send(responseObject);
     } catch (e) {
         console.log('Fetching Adzuna jobs failed: ', e);
         next(new ErrorObject(500, `Something went wrong in fetching Adzuna jobs! ${e}`));

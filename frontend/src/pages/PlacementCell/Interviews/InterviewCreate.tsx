@@ -56,21 +56,21 @@ export default function InterviewCreate() {
     </form>;
     return (
       <form onSubmit={onSubmit} className="ui form">
-        <div className="field">
+        <div className="field required">
           <input placeholder="company_name" {...register('company_name', {required: true})} />
           {errors.company_name && <div className="ui pointing red basic label">First name is required.</div>}
         </div>
-        <div className="field">
+        <div className="field required">
           <input placeholder="interview_name" {...register('interview_name', {required: true})} />
           {errors.interview_name && <div className="ui pointing red basic label">Last name is required.</div>}
         </div>
-        <div className="field">
+        <div className="field required">
           <input placeholder="description" {...register('description', {required: true})} />
           {errors.description && (
             <div className="ui pointing red basic label">Please enter a description of interview.</div>
           )}
         </div>
-        <div className="field">
+        <div className="field required">
           <input type="datetime-local" {...register('dateTimePicker', {valueAsDate: true, required: true})} />
           {errors.dateTimePicker && <div className="ui pointing red basic label">Please enter interview time.</div>}
         </div>

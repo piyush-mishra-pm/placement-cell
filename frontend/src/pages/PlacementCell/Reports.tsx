@@ -34,10 +34,17 @@ function Reports() {
     return (
       <div className="ui container">
         {studentData ? (
-          <CsvDownloadButton data={studentData} delimiter="|" headers={Object.keys(getDefaultSessionInstance())} />
+          <CsvDownloadButton
+            data={studentData}
+            delimiter="|"
+            headers={Object.keys(getDefaultSessionInstance())}
+            className="ui massive positive fluid button"
+          >
+            <i className="download icon"></i> Download data
+          </CsvDownloadButton>
         ) : (
-          <button className="massive positive button" onClick={onDownloadClicked}>
-            Fetch Student Interview Data
+          <button className="ui massive primary fluid button" onClick={onDownloadClicked}>
+            <i className="external square icon"></i> Fetch Student Interview Data
           </button>
         )}
         ;
