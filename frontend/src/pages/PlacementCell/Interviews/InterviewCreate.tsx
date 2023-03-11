@@ -74,7 +74,7 @@ export default function InterviewCreate() {
           <input type="datetime-local" {...register('dateTimePicker', {valueAsDate: true, required: true})} />
           {errors.dateTimePicker && <div className="ui pointing red basic label">Please enter interview time.</div>}
         </div>
-        <input type="submit" />
+        <input className="ui fluid primary button" type="submit" />
       </form>
     );
   }

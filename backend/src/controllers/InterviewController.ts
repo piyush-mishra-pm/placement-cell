@@ -2,8 +2,23 @@ import { NextFunction, Request, Response } from 'express';
 
 import pgDb from '../db/pg';
 import ErrorObject from '../utils/ErrorObject';
-import { redisDeleteKey, redisSaveWithTtl } from '../db/redis';
+import { redisDeleteKey, redisGet, redisSaveWithTtl } from '../db/redis';
 import { getRedisKey, REDIS_QUERY_TYPE } from '../db/redisHelper';
+
+const QUERY_GET_ALL_INTERVIEWS =
+    `SELECT
+        interview_id,
+        company_name,
+        interview_name,
+        description,
+        time,
+        interview_status,
+        student_id,
+        first_name, last_name,
+        batch
+    FROM interviews AS int
+    LEFT JOIN sessions ss USING(interview_id)
+    LEFT JOIN students st USING (student_id)`;
 
 export async function getAllInterviews(req: Request, res: Response, next: NextFunction) {
     const page = parseInt(req.params.page);
@@ -11,27 +26,34 @@ export async function getAllInterviews(req: Request, res: Response, next: NextFu
 
     try {
         const results = await pgDb.query(
-            `SELECT
-                interview_id,
-                company_name,
-                interview_name,
-                description,
-                time,
-                interview_status,
-                student_id,
-                first_name, last_name,
-                batch
-            FROM interviews AS int
-            LEFT JOIN sessions ss USING(interview_id)
-            LEFT JOIN students st USING (student_id)
-            ORDER BY ss.interview_id
+            `${QUERY_GET_ALL_INTERVIEWS}
+            ORDER BY int.interview_id,ss.student_id
             LIMIT $1 OFFSET $2`,
             [itemsPerPage, (page - 1) * itemsPerPage]);
         if (results.rows.length === 0) {
             return next(new ErrorObject(400, 'No Interviews results!'));
         }
         await redisSaveWithTtl(getRedisKey(REDIS_QUERY_TYPE.INTERVIEWS_GET, req), results.rows, 10);
-        return res.status(200).send({ success: 'true', message: 'Fetched Interview records successfully', data: results.rows });
+
+        // For Pagination: Cached exists for total student result count? (Expensive query so caching used).
+        const cachedTotalInterviewCount = await redisGet(REDIS_QUERY_TYPE.INTERVIEWS_COUNT_GET);
+        if (cachedTotalInterviewCount) {
+            return res.status(200).send({ success: 'true', message: 'Fetched interview records successfully', data: results.rows, meta: { numPages: Math.ceil(cachedTotalInterviewCount / itemsPerPage), count: cachedTotalInterviewCount } });
+        }
+
+        // For Pagination: Cached didnt exist, so query and store result in cache? (Expensive query so caching used).
+        const countResults = await pgDb.query(QUERY_GET_ALL_INTERVIEWS);
+
+        await redisSaveWithTtl(getRedisKey(REDIS_QUERY_TYPE.INTERVIEWS_COUNT_GET, req), countResults.rows.length, 60);// 1minute
+        return res.status(200).send({
+            success: 'true',
+            message: 'Fetched Interview records successfully',
+            data: results.rows,
+            meta: {
+                numPages: Math.ceil(countResults.rows.length / itemsPerPage),
+                count: countResults.rows.length
+            }
+        });
     } catch (e) {
         console.log('getAllInterviews failed: ', e);
         next(new ErrorObject(500, `Something went wrong in getAllInterviews!${e}`));
