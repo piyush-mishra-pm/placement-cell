@@ -5,7 +5,7 @@ _Interview management app for a fictitious coding bootcamp._
 Developed for CodingNinja's FullStack MERN project.
 
 Backend hosted at: https://placement-cell-be.onrender.com
-Frontend hosted at: https://fe-aauth-node-react.onrender.com/
+Frontend hosted at: https://placement-cell-fe.onrender.com
 
 ### **Frontend Walkthrough:** 
 

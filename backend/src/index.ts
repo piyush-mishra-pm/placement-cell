@@ -6,6 +6,7 @@ import mongoose from 'mongoose';
 import { configureRouter } from './api/v1/routes';
 import ErrorObject from './utils/ErrorObject';
 import * as UserModel from './models/UserModel';
+import morgan from 'morgan';
 
 mongoose
   .connect(KEYS.MONGO_DB_URL || 'mongodb://localhost:27017/auth_node_react')
@@ -13,6 +14,8 @@ mongoose
   .catch(() => console.log('Error connecting to DB'));
 
 const app = express();
+
+app.use(morgan('combined'));
 
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json());
