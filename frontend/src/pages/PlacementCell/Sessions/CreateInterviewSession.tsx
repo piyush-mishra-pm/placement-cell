@@ -8,12 +8,7 @@ import {useHttpClient} from '../../../hooks/httpHook';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 import ErrorModal from '../../../components/ErrorModal';
 import {AUTH_STATE, STATE, INTERVIEW_STATUS} from '../../../store/STATE_DEFINITIONS';
-import {
-  INTERVIEW_PAYLOAD,
-  INTERVIEW_STUDENT_PAYLOAD,
-  STUDENT_PAYLOAD,
-  STUDENT_PII_PAYLOAD,
-} from '../../../store/PAYLOAD_DEFINITIONS';
+import {INTERVIEW_STUDENT_PAYLOAD, STUDENT_PII_PAYLOAD} from '../../../store/PAYLOAD_DEFINITIONS';
 
 function CreateInterviewSession() {
   const {interviewId} = useParams<{

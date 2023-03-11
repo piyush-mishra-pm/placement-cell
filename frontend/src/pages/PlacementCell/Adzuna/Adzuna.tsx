@@ -10,11 +10,14 @@ import {AUTH_STATE, STATE} from '../../../store/STATE_DEFINITIONS';
 import {useSelector} from 'react-redux';
 import {EXTERNAL_JOB_PAYLOAD_OBJECT} from '../../../store/PAYLOAD_DEFINITIONS';
 import {getDefaultExternalJobsInstance} from '../../../store/PROTOTYPES';
+import Pagination from '../../../components/Pagination';
 
 function Adzuna() {
   const {page} = useParams<{
     page: string;
   }>();
+  const [currentPage, setCurrentPage] = useState(parseInt(page || '1'));
+  const [totalPages, setTotalPages] = useState(1);
 
   const {isLoading, error, sendRequest, clearErrorHandler} = useHttpClient();
   const authState: AUTH_STATE = useSelector((state: STATE) => state.auth);
@@ -22,34 +25,35 @@ function Adzuna() {
     results: [getDefaultExternalJobsInstance()],
     count: 0,
   });
-
+  const RESULTS_PER_PAGE = 20;
   useEffect(() => {
     (async () => {
       try {
         const response = await sendRequest({
           successMessage: 'Successfully fetched external jobs!',
-          url: `/adzuna/itjobs/${page || 1}/20`,
+          url: `/adzuna/itjobs/${currentPage || 1}/${RESULTS_PER_PAGE}`,
           method: 'GET',
           headers: {Authorization: `Bearer ${authState.jwt}`},
         });
         console.log('API_GETTING_EXTERNAL_JOBS', response.data);
         setExternalJobsResult(response.data);
+        setTotalPages(Math.ceil(response.data.count / RESULTS_PER_PAGE));
       } catch (e: any) {
         // Don't reset Students Redux state.
       }
     })();
-  }, [sendRequest, authState.jwt]);
+  }, [sendRequest, authState.jwt, currentPage]);
 
   function renderContent() {
     return (
       <div className="ui container">
-        <p>
-          Adzuna Jobs API results:
+        <Pagination page={currentPage} pages={totalPages} changePage={setCurrentPage} />
+        <div>
+          Total results in Adzuna API: {(externalJobsResult && externalJobsResult.count) || 0}
           <br />
-          Total results: {(externalJobsResult && externalJobsResult.count) || 0}
-          <br />
-          Page results: {(externalJobsResult && externalJobsResult.results && externalJobsResult.results.length) || 0}
-        </p>
+          Page showing results:{' '}
+          {(externalJobsResult && externalJobsResult.results && externalJobsResult.results.length) || 0}
+        </div>
         <table className="ui celled structured striped table">
           <thead className="center aligned">
             <tr>
