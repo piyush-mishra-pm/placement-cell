@@ -27,11 +27,17 @@ export function getRedisKey(queryType: REDIS_QUERY_TYPE, req: Request): string {
     else if (queryType === REDIS_QUERY_TYPE.STUDENTS_GET) {
         return `ST_ALL_${page}_${itemsPerPage}`;
     }
+    else if (queryType === REDIS_QUERY_TYPE.STUDENTS_COUNT_GET) {
+        return `ST_CNT`;
+    }
     else if (queryType === REDIS_QUERY_TYPE.STUDENT_GET) {
         return `ST_${studentId}`
     }
     else if (queryType === REDIS_QUERY_TYPE.INTERVIEWS_GET) {
         return `INT_ALL_${page}_${itemsPerPage}`;
+    }
+    else if (queryType === REDIS_QUERY_TYPE.INTERVIEWS_COUNT_GET) {
+        return `INT_CNT`;
     }
     else if (queryType === REDIS_QUERY_TYPE.INTERVIEW_GET) {
         return `INT_${interviewId}`
@@ -57,9 +63,11 @@ export enum REDIS_QUERY_TYPE {
     STUDENT_ID_EXISTS = 'STUDENT_ID_EXISTS',
     STUDENT_GET = 'STUDENT_GET',
     STUDENTS_GET = 'STUDENTS_GET',
+    STUDENTS_COUNT_GET = 'STUDENTS_COUNT_GET',
 
     INTERVIEW_GET = 'INTERVIEW_GET',
     INTERVIEWS_GET = 'INTERVIEWS_GET',
+    INTERVIEWS_COUNT_GET = 'INTERVIEWS_COUNT_GET',
     INTERVIEW_ID_EXISTS = 'INTERVIEW_ID_EXISTS',
 
     SESSION_ID_EXISTS = 'SESSION_ID_EXISTS',

@@ -64,7 +64,7 @@ export default function StudentCreate() {
           <input placeholder="batch" {...register('batch', {required: true, pattern: /\d+/})} />
           {errors.batch && <div className="ui pointing red basic label">Please enter number for age.</div>}
         </div>
-        <input type="submit" />
+        <input className="ui fluid primary button" type="submit" />
       </form>
     );
   }

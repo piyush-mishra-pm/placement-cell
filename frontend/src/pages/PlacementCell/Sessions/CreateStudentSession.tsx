@@ -137,7 +137,7 @@ function CreateStudentSession() {
         </div>
         <div className="ui divider"></div>
         <div className="ui container">
-          <h3 className="ui header centerd">Already registered interviews</h3>
+          <h3 className="ui header centered">Already registered interviews</h3>
           <table className="ui celled structured striped table">
             <thead className="center aligned">
               <tr>
@@ -194,7 +194,7 @@ function CreateStudentSession() {
       <React.Fragment>
         <div className="ui container">
           <div className="content">
-            <div className="header">More interviews available for Student.</div>
+            <h3 className="ui header centered">More interviews available for Student.</h3>
             <div className="description">
               <table className="ui celled structured striped table">
                 <thead className="center aligned">

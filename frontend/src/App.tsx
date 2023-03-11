@@ -36,11 +36,19 @@ function App() {
           <Route path="/login" exact component={Login} />
           <Route path="/login-failure" exact component={OAuthFailure} />
           <Route path="/login-success/:token" exact component={OAuthSuccess} />
-          <Route path="/students" exact component={Students} />
-          <Route path="/interviews" exact component={Interviews} />
+          <Route path="/students/:page?" exact component={Students} />
+          <Route path="/interviews/:page?" exact component={Interviews} />
           <Route path="/session/edit/:studentId/:interviewId" exact component={EditSession} />
-          <Route path="/session/create-student-session/:studentId" exact component={CreateStudentSession} />
-          <Route path="/session/create-interview-session/:interviewId" exact component={CreateInterviewSession} />
+          <Route
+            path="/session/create-student-session/:studentId/:scheduledPage?/:availablePage?"
+            exact
+            component={CreateStudentSession}
+          />
+          <Route
+            path="/session/create-interview-session/:interviewId/:scheduledPage?/:availablePage?"
+            exact
+            component={CreateInterviewSession}
+          />
           <Route path="/reports" exact component={Reports} />
           <Route path="/external-jobs/:page?" exact component={Adzuna} />
           <Route path="/" exact component={Home} />

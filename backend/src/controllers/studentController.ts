@@ -2,8 +2,23 @@ import { NextFunction, Request, Response } from 'express';
 
 import pgDb from '../db/pg';
 import ErrorObject from '../utils/ErrorObject';
-import { redisDeleteKey, redisSaveWithTtl } from '../db/redis';
+import { redisDeleteKey, redisGet, redisSaveWithTtl } from '../db/redis';
 import { getRedisKey, REDIS_QUERY_TYPE } from '../db/redisHelper';
+
+const QUERY_SELECT_ALL_STUDENTS =
+    `SELECT 
+        st.student_id as student_id, 
+        first_name, last_name, 
+        batch, 
+        ss.interview_id, 
+        company_name, 
+        interview_name, 
+        description, 
+        time, 
+        interview_status 
+    FROM students AS st 
+    LEFT JOIN sessions ss ON ss.student_id = st.student_id 
+    LEFT JOIN interviews int ON int.interview_id = ss.interview_id`;
 
 export async function getAllStudents(req: Request, res: Response, next: NextFunction) {
     try {
@@ -11,20 +26,8 @@ export async function getAllStudents(req: Request, res: Response, next: NextFunc
         const itemsPerPage = parseInt(req.params.itemsPerPage);
 
         const results = await pgDb.query(
-            `SELECT 
-                st.student_id as student_id, 
-                first_name, last_name, 
-                batch, 
-                ss.interview_id, 
-                company_name, 
-                interview_name, 
-                description, 
-                time, 
-                interview_status 
-            FROM students AS st 
-            LEFT JOIN sessions ss ON ss.student_id = st.student_id 
-            LEFT JOIN interviews int ON int.interview_id = ss.interview_id
-            ORDER BY ss.student_id
+            `${QUERY_SELECT_ALL_STUDENTS}
+            ORDER BY st.student_id, ss.interview_id
             LIMIT $1 OFFSET $2`,
             [itemsPerPage, (page - 1) * itemsPerPage]);
 
@@ -32,7 +35,27 @@ export async function getAllStudents(req: Request, res: Response, next: NextFunc
             return next(new ErrorObject(400, `Students don't exist!`));
         }
         await redisSaveWithTtl(getRedisKey(REDIS_QUERY_TYPE.STUDENTS_GET, req), results.rows, 10);
-        return res.status(200).send({ success: 'true', message: 'Fetched student records successfully', data: results.rows });
+
+        // For Pagination: Cached exists for total student result count? (Expensive query so caching used).
+        const cachedTotalStudentCount = await redisGet(REDIS_QUERY_TYPE.STUDENTS_COUNT_GET);
+        if (cachedTotalStudentCount) {
+            return res.status(200).send({ success: 'true', message: 'Fetched student records successfully', data: results.rows, meta: { numPages: Math.ceil(cachedTotalStudentCount / itemsPerPage), count: cachedTotalStudentCount } });
+        }
+
+        // For Pagination: Cached didnt exist, so query and store result in cache? (Expensive query so caching used).
+        const countResults = await pgDb.query(QUERY_SELECT_ALL_STUDENTS);
+
+        await redisSaveWithTtl(getRedisKey(REDIS_QUERY_TYPE.STUDENTS_COUNT_GET, req), countResults.rows.length, 60);// 1minute
+        return res.status(200).send({
+            success: 'true',
+            message: 'Fetched student records successfully',
+            data: results.rows,
+            meta: {
+                numPages: Math.ceil(countResults.rows.length / itemsPerPage),
+                count: countResults.rows.length
+            }
+        });
+
     } catch (e) {
         console.log('getAllStudents failed: ', e);
         next(new ErrorObject(500, `Something went wrong in getAllStudents!${e}`));

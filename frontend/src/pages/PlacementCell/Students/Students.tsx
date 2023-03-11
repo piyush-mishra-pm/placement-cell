@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {toast} from 'react-toastify';
 
 import ACTION_TYPES from '../../../store/actions/ACTION_TYPES';
@@ -10,28 +10,35 @@ import {useSelector} from 'react-redux';
 import {AUTH_STATE, STATE} from '../../../store/STATE_DEFINITIONS';
 import StudentCreate from './StudentCreate';
 import RenderStudentsInterviewTable from './RenderStudentsInterviewTable';
+import {useParams} from 'react-router-dom';
+import Pagination from '../../../components/Pagination';
 
 function Students() {
   const {isLoading, error, sendRequest, clearErrorHandler} = useHttpClient();
   const studentsDispatcher = useStudentsDispatcher();
   const authState: AUTH_STATE = useSelector((state: STATE) => state.auth);
 
+  let {page} = useParams<{page?: string}>();
+  const [currentPage, setCurrentPage] = useState(parseInt(page || '1'));
+  const [totalPages, setTotalPages] = useState(1);
   useEffect(() => {
     (async () => {
       try {
         const response = await sendRequest({
           successMessage: 'Studenst successfully fetched!',
-          url: '/students/1/15',
+          url: `/students/${currentPage}/3`,
           method: 'GET',
           headers: {Authorization: `Bearer ${authState.jwt}`},
         });
         console.log('API_GETTING_STUDENTS', response);
         studentsDispatcher(ACTION_TYPES.STUDENTS.GET_STUDENTS, response.data);
+        //setCurrentPage(currentPage);
+        setTotalPages(response.meta.numPages);
       } catch (e: any) {
         // Don't reset Students Redux state.
       }
     })();
-  }, [sendRequest, studentsDispatcher, authState.jwt]);
+  }, [sendRequest, studentsDispatcher, authState.jwt, currentPage]);
 
   function deleteStudent(studentId?: number) {
     if (!studentId) return;
@@ -79,9 +86,11 @@ function Students() {
 
   function renderContent() {
     return (
-      <div className="ui container">
+      <div className="ui center aligned container">
         <h2>Students</h2>
         <StudentCreate />
+        <div className="ui divider"></div>
+        <Pagination page={currentPage} pages={totalPages} changePage={setCurrentPage} />
         <RenderStudentsInterviewTable
           onDeleteStudent={deleteStudent}
           onDeleteStudentInterview={deleteStudentInterview}
