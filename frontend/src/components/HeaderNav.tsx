@@ -29,7 +29,7 @@ function HeaderNav() {
     return (
       <div className="ui borderless huge menu">
         <Link to="/" className="ui header item">
-          Auth-React-Node
+          Placement-Cell
         </Link>
         <div className="menu right">
           {loggedInUser && (

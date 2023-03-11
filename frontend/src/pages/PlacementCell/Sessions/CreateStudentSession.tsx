@@ -9,10 +9,13 @@ import LoadingSpinner from '../../../components/LoadingSpinner';
 import ErrorModal from '../../../components/ErrorModal';
 import {AUTH_STATE, STATE, INTERVIEW_STATUS} from '../../../store/STATE_DEFINITIONS';
 import {INTERVIEW_PAYLOAD, STUDENT_PAYLOAD} from '../../../store/PAYLOAD_DEFINITIONS';
+import Pagination from '../../../components/Pagination';
 
 function CreateStudentSession() {
-  const {studentId} = useParams<{
+  const {studentId, scheduledPage, availablePage} = useParams<{
     studentId: string;
+    scheduledPage: string;
+    availablePage: string;
   }>();
 
   const {isLoading, error, sendRequest, clearErrorHandler} = useHttpClient();
@@ -20,6 +23,13 @@ function CreateStudentSession() {
 
   const [currentSessionsData, setCurrentSessionsData] = useState<Array<STUDENT_PAYLOAD>>([]);
   const [availableSessionsData, setAvailableSessionsData] = useState<Array<INTERVIEW_PAYLOAD>>([]);
+
+  const [currentScheduledPage, setCurrentScheduledPage] = useState(parseInt(scheduledPage || '1'));
+  const [totalScheduledPages, setTotalScheduledPages] = useState(1);
+  const [currentAvailablePage, setCurrentAvailablePage] = useState(parseInt(availablePage || '1'));
+  const [totalAvailablePages, setTotalAvailablePages] = useState(1);
+
+  const NUMBER_OF_RESULTS_PER_PAGE = 3;
   const history = useHistory();
 
   useEffect(() => {
@@ -28,12 +38,13 @@ function CreateStudentSession() {
       try {
         const response = await sendRequest({
           successMessage: 'Session successfully fetched!',
-          url: `/sessions/student/${studentId}/1/5`,
+          url: `/sessions/student/${studentId}/${currentScheduledPage}/${NUMBER_OF_RESULTS_PER_PAGE}`,
           method: 'GET',
           headers: {'Content-Type': 'application/json', Authorization: `Bearer ${authState.jwt}`},
         });
         console.log('API_GETTING_STUDENT_SESSIONS', response);
         setCurrentSessionsData(response.data);
+        setTotalScheduledPages(response.meta.numPages);
       } catch (e: any) {
         // Don't reset Students Redux state.
       }
@@ -44,17 +55,18 @@ function CreateStudentSession() {
       try {
         const response = await sendRequest({
           successMessage: 'Session successfully fetched!',
-          url: `sessions/student/available/${studentId}/1/5`,
+          url: `sessions/student/available/${studentId}/${currentAvailablePage}/${NUMBER_OF_RESULTS_PER_PAGE}`,
           method: 'GET',
           headers: {'Content-Type': 'application/json', Authorization: `Bearer ${authState.jwt}`},
         });
         console.log('API_GETTING_STUDENT_AVAILABLE_SESSIONS', response);
         setAvailableSessionsData(response.data);
+        setTotalAvailablePages(response.meta.numPages);
       } catch (e: any) {
         // Don't reset Students Redux state.
       }
     })();
-  }, [sendRequest, authState.jwt, studentId]);
+  }, [sendRequest, authState.jwt, studentId, currentAvailablePage, currentScheduledPage]);
 
   function onDeleteStudentInterview(studentId?: number, interviewId?: number): void {
     if (Number.isNaN(studentId) || Number.isNaN(interviewId)) {
@@ -138,6 +150,7 @@ function CreateStudentSession() {
         <div className="ui divider"></div>
         <div className="ui container">
           <h3 className="ui header centered">Already registered interviews</h3>
+          <Pagination page={currentScheduledPage} pages={totalScheduledPages} changePage={setCurrentScheduledPage} />
           <table className="ui celled structured striped table">
             <thead className="center aligned">
               <tr>
@@ -195,6 +208,7 @@ function CreateStudentSession() {
         <div className="ui container">
           <div className="content">
             <h3 className="ui header centered">More interviews available for Student.</h3>
+            <Pagination page={currentAvailablePage} pages={totalAvailablePages} changePage={setCurrentAvailablePage} />
             <div className="description">
               <table className="ui celled structured striped table">
                 <thead className="center aligned">

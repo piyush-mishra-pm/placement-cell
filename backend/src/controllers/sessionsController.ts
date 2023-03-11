@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 
 import pgDb from '../db/pg';
 import ErrorObject from '../utils/ErrorObject';
-import { redisSaveWithTtl, redisDeleteKey } from '../db/redis';
+import { redisSaveWithTtl, redisDeleteKey, redisGet } from '../db/redis';
 import { getRedisKey, REDIS_QUERY_TYPE } from '../db/redisHelper';
 
 export async function createSession(req: Request, res: Response, next: NextFunction) {
@@ -95,8 +95,26 @@ export async function getSessionsOfStudent(req: Request, res: Response, next: Ne
             return next(new ErrorObject(400, 'No such interview sessions of the student.'));
         }
         // Save in Cache:
-        await redisSaveWithTtl(getRedisKey(REDIS_QUERY_TYPE.SESSIONS_OF_STUDENT_ID, req), results.rows, 10);
-        return res.status(200).send({ success: 'true', message: 'Fetched Sessions of student successfully', data: results.rows });
+        //await redisSaveWithTtl(getRedisKey(REDIS_QUERY_TYPE.SESSIONS_OF_STUDENT_ID, req), results.rows, 10);
+
+        // For Pagination:
+        const countResults = await pgDb.query(
+            `SELECT COUNT(*)
+            FROM students AS st 
+            LEFT JOIN sessions ss ON ss.student_id = st.student_id 
+            LEFT JOIN interviews int ON int.interview_id = ss.interview_id
+            WHERE ss.student_id=$1`, [studentId]);
+
+        return res.status(200).send({
+            success: 'true',
+            message: 'Fetched Sessions of student successfully',
+            data: results.rows,
+            meta: {
+                numPages: Math.ceil(countResults.rows[0].count / itemsPerPage),
+                count: countResults.rows[0].count
+            }
+        });
+
     } catch (e) {
         console.log('Fetching Student Session failed: ', e);
         next(new ErrorObject(500, `Something went wrong in getSessionsOfStudent!${e}`));
@@ -116,17 +134,43 @@ export async function getSessionsAvailabaleForStudentToTake(req: Request, res: R
             `SELECT * 
             FROM interviews 
             WHERE interview_id 
-                NOT IN (SELECT DISTINCT interview_id 
-                        FROM sessions 
-                        WHERE student_id=$1) 
+                NOT IN (
+                    SELECT DISTINCT interview_id 
+                    FROM sessions 
+                    WHERE student_id=$1
+                ) 
             LIMIT $2 OFFSET $3;`,
             [studentId, itemsPerPage, (page - 1) * itemsPerPage]);
         if (results.rows.length === 0) {
             return next(new ErrorObject(400, 'No available sessions for the student.'));
         }
         // Save in Cache:
-        await redisSaveWithTtl(getRedisKey(REDIS_QUERY_TYPE.SESSIONS_AVAILABLE_FOR_STUDENT_TO_TAKE, req), results.rows, 10);
-        return res.status(200).send({ success: 'true', message: 'Fetched Sessions of student successfully', data: results.rows });
+        //await redisSaveWithTtl(getRedisKey(REDIS_QUERY_TYPE.SESSIONS_AVAILABLE_FOR_STUDENT_TO_TAKE, req), results.rows, 10);
+
+        // For Pagination:
+        const countResults = await pgDb.query(
+            `SELECT COUNT(*)
+            FROM interviews 
+            WHERE interview_id 
+                NOT IN (
+                    SELECT DISTINCT interview_id 
+                    FROM sessions 
+                    WHERE student_id=$1
+                )`,
+            [studentId]);
+
+
+        console.log('👍', { numPage: countResults.rows[0] / itemsPerPage, itemsPerPage, result: results.rows[0], countResults: countResults.rows[0].count });
+
+        return res.status(200).send({
+            success: 'true',
+            message: 'Successfully fetched Available Sessions for student to take.',
+            data: results.rows,
+            meta: {
+                numPages: Math.ceil(countResults.rows[0].count / itemsPerPage),
+                count: countResults.rows[0].count
+            }
+        });
     } catch (e) {
         console.log('Fetching Student Avaiblable Session to take, failed: ', e);
         next(new ErrorObject(500, `Something went wrong in getSessionsAvailabaleForStudentToTake!${e}`));
@@ -164,8 +208,27 @@ export async function getSessionsOfInterview(req: Request, res: Response, next: 
             return next(new ErrorObject(400, 'No such interview sessions of the Interview.'));
         }
         // Save in Cache:
-        await redisSaveWithTtl(getRedisKey(REDIS_QUERY_TYPE.SESSIONS_OF_INTERVIEW_ID, req), results.rows, 10);
-        return res.status(200).send({ success: 'true', message: 'Fetched Sessions of interview successfully', data: results.rows });
+        //await redisSaveWithTtl(getRedisKey(REDIS_QUERY_TYPE.SESSIONS_OF_INTERVIEW_ID, req), results.rows, 10);
+
+        // For Pagination:
+        const countResults = await pgDb.query(
+            `SELECT COUNT(*) 
+            FROM interviews AS int 
+            LEFT JOIN sessions ss ON int.interview_id = ss.interview_id
+            LEFT JOIN students st ON ss.student_id = st.student_id 
+            WHERE ss.interview_id=$1`,
+            [interviewId]);
+
+        return res.status(200).send({
+            success: 'true',
+            message: 'Fetched Sessions of interview successfully',
+            data: results.rows,
+            meta: {
+                numPages: Math.ceil(countResults.rows[0].count / itemsPerPage),
+                count: countResults.rows[0].count
+            }
+        });
+
     } catch (e) {
         console.log('Fetching Sessions of interview failed: ', e);
         next(new ErrorObject(500, `Something went wrong in getSessionsOfInterview!${e}`));
@@ -195,8 +258,28 @@ export async function getStudentsAvailableForInterviewSession(req: Request, res:
             return next(new ErrorObject(400, 'No such interview sessions of the Interview.'));
         }
         // Save in Cache:
-        await redisSaveWithTtl(getRedisKey(REDIS_QUERY_TYPE.STUDENTS_AVAILABLE_TO_TAKE_INTERVIEW, req), results.rows, 10);
-        return res.status(200).send({ success: 'true', message: 'Fetched Sessions of interview successfully', data: results.rows });
+        //await redisSaveWithTtl(getRedisKey(REDIS_QUERY_TYPE.STUDENTS_AVAILABLE_TO_TAKE_INTERVIEW, req), results.rows, 10);
+
+        // For Pagination:
+        const countResults = await pgDb.query(
+            `SELECT COUNT(*) 
+            FROM students
+            WHERE student_id
+                NOT IN (SELECT DISTINCT student_id
+                        FROM sessions
+                        WHERE interview_id=$1)
+                `,
+            [interviewId]);
+
+        return res.status(200).send({
+            success: 'true',
+            message: 'Fetched Sessions of interview successfully',
+            data: results.rows,
+            meta: {
+                numPages: Math.ceil(countResults.rows[0].count / itemsPerPage),
+                count: countResults.rows[0].count
+            }
+        });
     } catch (e) {
         console.log('Fetching Sessions of interview failed: ', e);
         next(new ErrorObject(500, `Something went wrong in getSessionsOfInterview!${e}`));
