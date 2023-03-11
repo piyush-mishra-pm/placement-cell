@@ -4,7 +4,7 @@ _Interview management app for a fictitious coding bootcamp._
 
 Developed for CodingNinja's FullStack MERN project.
 
-Backend hosted at: https://auth-node-react.onrender.com
+Backend hosted at: https://placement-cell-be.onrender.com
 Frontend hosted at: https://fe-aauth-node-react.onrender.com/
 
 ### **Frontend Walkthrough:** 
@@ -52,21 +52,47 @@ Video Walkthorugh of UX:
 ---
 ### **Architecture and broad flow:**:
 ```mermaid
-flowchart LR
+flowchart TD
 subgraph internal APIs
-  u[User] -->|1. Request React SPA| fe[React SPA on Frontend server]
-  fe -->|2. Delivering React SPA| u
-  u --> |3. Downloaded React SPA requests| api{Node API backend server}
-  api -->|4. Auth Query| mongoDb[(MongoDB-Atlas)]
-  mongoDb -->|5. db responding to query| api
-  api -->|6. Student-Interview Query| redis[(Redis-Cache)]
-  api -->|7. Student-Interview Query| pgDb[(PostGresDB)]
+  u[User] -->|Request React SPA| fe[React SPA on Frontend server]
+  fe -->|Delivering React SPA| u
+  u --> |Downloaded React SPA requests| api{Node}
+  redis --> |SQL data uncached| pgDb
+  pgDb --> |Caching SQL data| redis
+  redis --> |Auth data| mongoDb
+  redis --> |Respond cached data| api
+  mongoDb --> |Auth data| redis
+  api -->|Auth Query| mongoDb[(MongoDB-Atlas)]
+  mongoDb -->|db responding to query| api
+  api -->|Cached Student-Interview Query,\n Auth query,\n Adzuna Jobs query| redis[(Redis-Cache)]
+  api -->|Student-Interview Query| pgDb[(PostGresDB)]
 end
 subgraph external APIs
-  api -->|4. node oAuth request to google| google[googleoAuth]
-  google -->|5. oAuth callback and response| api
+  redis -->|4. Adzuna Jobs API request| adzuna[Adzuna-Jobs API]
+  adzuna -->|5. Adzuna jobs response| api
   api -->|email sending request| sendgrid[Send-Grid Email Servers]
-  api -->|Query GitHub Jobs API| gitHub[GitHub Jobs]
+end
+```
+---
+### **Caching: Request flow between Node, Redis and PostgreSQL:**:
+```mermaid
+flowchart LR
+subgraph When Cached Results
+  n[node] -->|2. requests cache| r[Redis]
+  r[Redis] -->|3. results present in cache| n
+  n -->|4. Respond to client| u[User]
+  u-->|1. Request BE|n
+end
+
+subgraph When Un-Cached Results  
+  n1 -->|2. requests cache| r1[Redis]  
+  r1[Redis] -->|3. results not present in cache| n1
+  n1 -->|4. requests DB| p1[(PostgreSQL)]
+  p1 -->|5. responds| n1
+  n1 -->|6. fill Cache| r1
+  u1-->|1. Request BE| n1[node]
+  r1 -->|7. caching response| n1
+  n1 -->|8. respond to User| u1
 end
 ```
 ---
