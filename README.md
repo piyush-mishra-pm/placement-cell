@@ -92,7 +92,7 @@ subgraph When Un-Cached Results
   n1 -->|6. fill Cache| r1
   u1-->|1. Request BE| n1[node]
   r1 -->|7. caching response| n1
-  n1 -->|8. respond to User| u1
+  n1 -->|8. respond to User| u1[User]
 end
 ```
 ---

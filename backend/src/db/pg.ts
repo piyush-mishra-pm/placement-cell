@@ -1,7 +1,7 @@
 import { Pool } from 'pg';
 import * as KEYS from '../config/envKeys';
 
-const pool = new Pool({ connectionString: KEYS.POSTGRES_URL, ssl: true, });
+const pool = new Pool({ connectionString: KEYS.POSTGRES_URL, ssl: { rejectUnauthorized: false }, });
 
 export default {
     async query(text: string, params?: any) {

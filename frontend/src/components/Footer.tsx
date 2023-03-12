@@ -7,10 +7,9 @@ function Footer() {
       <div className="ui very padded text container">
         <ul className="ui warning message">
           <li>
-            As server might be dormant, first few API request might take upto 1 minute to serve. Then onwards it should
+            As server might be dormant, first few API request might take upto 5 minute to serve. Then onwards it should
             work at faster speeds. Please be patient for 5 min, and keep refreshing.
           </li>
-          <li>Due to missing SSL certificates on backend, your VPN could be causing CORS errors for certain routes.</li>
           <li>If you can't see a password recovery mail in your inbox, then check your SPAM folder too.</li>
         </ul>
       </div>
