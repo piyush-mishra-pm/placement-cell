@@ -20,19 +20,19 @@ function RenderStudentsInterviewTable(props: any) {
       <table className="ui celled structured striped table">
         <thead className="center aligned">
           <tr>
-            <th rowSpan={2}>Student-ID</th>
-            <th rowSpan={2}>Student-First-Name</th>
-            <th rowSpan={2}>Student-Last-Name</th>
+            <th rowSpan={2}>Student ID</th>
+            <th rowSpan={2}>Student First Name</th>
+            <th rowSpan={2}>Student Last Name</th>
             <th rowSpan={2}>Batch</th>
             <th colSpan={6}>Interview Session details</th>
           </tr>
           <tr>
-            <th>interview_id</th>
-            <th>company_name</th>
-            <th>interview_name</th>
+            <th>interview id</th>
+            <th>company name</th>
+            <th>interview name</th>
             <th>description</th>
             <th>time</th>
-            <th>interview_status</th>
+            <th>interview status</th>
           </tr>
         </thead>
         <tbody>
