@@ -10,14 +10,13 @@ Frontend hosted at: https://placement-cell-fe.onrender.com
 ### **Frontend Walkthrough:** 
 
 Video Walkthorugh of UX:
-[![Video Walkthrough](https://img.youtube.com/vi/hXLodKNI_GY/maxresdefault.jpg)](https://youtu.be/hXLodKNI_GY)
+[![Video Walkthrough](https://img.youtube.com/vi/Vh2P3Okh67o/maxresdefault.jpg)](https://youtu.be/Vh2P3Okh67o)
 
 ---
 ### **Features:** 
 - Typescript for better type safety.
 - Reuses auth code from [this repo](https://github.com/piyush-mishra-pm/auth-node-react). Borrows following features:
-  - Login/Register via Email, Password.
-  - **Google oAuth2** sign-in / register (using Passport)
+  - Login/ Register/ Forgot-password via Email, Password.
   - **3 Tier architecture** for better performance.
     - Node/Express backend server.
     - React frontend server.
@@ -171,10 +170,8 @@ erDiagram
 
 ## **How to Run**:
 Prerequisites: 
-- needs atleast Node v.16.5, and MongoDB pre-installed.
-- Prepare env variables file with following variables.
-```
-```
+- needs atleast Node v.16.5, and MongoDB pre-installed. Uses redis, and postgres as well, but can use URL from amanaged hosting like `Render.com`.
+- Prepare env variables file with variables listed in `/backend/src/config/prod.js`.
 
 To run the backend node server on port 8000, in development mode, type following in the command line (assuming your current working directory is this repo).
 ```
@@ -189,11 +186,6 @@ To run the frontend ReactJS server on port 3000 type following in the command li
 cd ./frontend/
 npm install
 npm start
-```
----
-## **Folder Structure**:
-```
-
 ```
 ---
 ## **Tasks**:
