@@ -52,51 +52,73 @@ Video Walkthorugh of UX:
 ---
 ### **Architecture and broad flow:**:
 ```mermaid
-flowchart TD
+flowchart RL
 subgraph internal APIs
-  u[User] -->|Request React SPA| fe[React SPA on Frontend server]
-  fe -->|Delivering React SPA| u
-  u --> |Downloaded React SPA requests| api{Node}
-  redis --> |SQL data uncached| pgDb
-  pgDb --> |Caching SQL data| redis
-  redis --> |Auth data| mongoDb
-  redis --> |Respond cached data| api
-  mongoDb --> |Auth data| redis
+  u[User] -->|Request\n React SPA| fe[React SPA\n FE server]
+  fe -->|Delivering\n React SPA| u
+  u --> |Requests using\nReact SPA| api{Node}
+  redis --> |Respond \ncached\n data| api
   api -->|Auth Query| mongoDb[(MongoDB-Atlas)]
-  mongoDb -->|db responding to query| api
-  api -->|Cached Student-Interview Query,\n Auth query,\n Adzuna Jobs query| redis[(Redis-Cache)]
+  mongoDb -->|db responding\n to query| api
+  api -->|Cached\n Student-Interview,\n Auth,\n Adzuna Jobs| redis[(Redis-Cache)]
   api -->|Student-Interview Query| pgDb[(PostGresDB)]
+  redis -.-|Auth data| mongoDb
+  redis -.-|student,\ninterviews\n data| pgDb
+  pgDb -->|respond\n student,\ninterviews| api
+  api --> |Reponse| u
 end
 subgraph external APIs
-  redis -->|4. Adzuna Jobs API request| adzuna[Adzuna-Jobs API]
-  adzuna -->|5. Adzuna jobs response| api
+  redis -.-|Cache Adzuna Jobs| adzuna[Adzuna-Jobs API]
+  adzuna -->|5. Adzuna jobs\n response| api
   api -->|email sending request| sendgrid[Send-Grid Email Servers]
+  api -->adzuna
 end
 ```
 ---
-### **Caching: Request flow between Node, Redis and PostgreSQL:**:
+## Caching flow:
+
+### **Write through Cache**: 
+#### **Read-request flow:**:
 ```mermaid
 flowchart LR
-subgraph When Cached Results
+subgraph "READ: When Cached Results"
   n[node] -->|2. requests cache| r[Redis]
   r[Redis] -->|3. results present in cache| n
   n -->|4. Respond to client| u[User]
-  u-->|1. Request BE|n
-end
-
-subgraph When Un-Cached Results  
-  n1 -->|2. requests cache| r1[Redis]  
-  r1[Redis] -->|3. results not present in cache| n1
-  n1 -->|4. requests DB| p1[(PostgreSQL)]
-  p1 -->|5. responds| n1
-  n1 -->|6. fill Cache| r1
-  u1-->|1. Request BE| n1[node]
-  r1 -->|7. caching response| n1
-  n1 -->|8. respond to User| u1[User]
+  u-->|1. Get-Request|n
 end
 ```
+```mermaid
+flowchart RL
+subgraph When Un-Cached Results  
+  n1 -->|2. requests\n cache| r1[Redis]  
+  r1[Redis] -->|3. results not\n present in cache| n1
+  p1 -->|5. responds| n1
+  n1 -->|6. fill\n Cache| r1
+  u1-->|1. Request\n BE| n1[node]
+  r1 -->|7. caching\n response| n1
+  n1 -->|8. respond\n to User| u1[User]
+  n1 -->|4. requests\n DB| p1[(PostgreSQL\n/MongoDB)]
+end
+```
+#### **Write-request flow:**:
+```mermaid
+flowchart LR
+subgraph "WRITE: When Cached Results"  
+  n1 -->|4. fill or \n delete Cache| r1[Redis]
+  n1 -->|2. updates\n DB| p1[(MongoDB\n/PostGreSQL)]
+  p1 -->|3. DB update\n response| n1
+  r1 -->|5. caching\n response| n1
+  u1-->|1. Update\n or Delete\n request| n1[node]
+  n1 -->|6. respond\n to User| u1[User]
+end
+```
+
 ---
+---
+
 ### ***ER Diagram and Attributes***
+### Student, Interview and Session schema:
 ```mermaid
 erDiagram
   Student {
@@ -108,11 +130,13 @@ erDiagram
   Interview {
     int interview_id PK
     string company_name
-    date interview_date
+    date time
+    string description
+    string interview_name
   }
   Session{
-    int student_id PK
-    int interview_id PK
+    int student_id FK
+    int interview_id FK
     string interview_status "4 values possible: PASS, FAIL, ON_HOLD, NOT_ATTEMPTED"
   }
   Student }|--|{ Interview : takes
@@ -120,6 +144,29 @@ erDiagram
   Interview ||--|{ Session : has
 ```
 
+---
+### Auth Schema:
+```mermaid
+erDiagram
+  user {
+    string id
+    string first_name
+    string last_name
+    string email
+    string password
+  }
+  reset {
+    int interview_id PK
+    string company_name
+    date time
+    string description
+    string interview_name
+  }
+
+  user ||--|{ reset : generates
+```
+
+---
 ---
 
 ## **How to Run**:
